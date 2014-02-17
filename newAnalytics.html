@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		
+		<title>Business Admin - Analytics Screen</title>
+		
+		<link rel="stylesheet" href="css/bootstrap.css" />
+		<link rel="stylesheet" href="css/bootstrap-responsive.css" />
+		<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="css/new.css" />
+
+		<!-- Bootstrap, jQuery and jQuery-UI -->
+		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/bootstrap.js"></script>
+		<script type="text/javascript" src="js/jquery.sparkline.js"></script>
+
+		<!-- Google Chart JavaScript --> 
+		<!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization',
+		'version':'1','packages':['corechart']}]}"></script>-->
+		 
+
+		<!-- High Chart JavaScript -->
+		<script src="http://code.highcharts.com/highcharts.js"></script>
+		<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+		<!-- Custom JavaScript -->
+	  	<script type="text/javascript">
+
+	  	$( function () {
+	  		
+	  		getDisplayDate();
+
+	  		$('#from').datepicker({
+	  			defaultDate: "+1w",
+	  			// numberOfMonths:3,
+	  			// showCurrentAtPos:1,
+	  			maxDate:0,
+	  			onSelect: function( selectedDate ) {
+	  				$( "#to" ).datepicker( "option", "minDate", selectedDate );
+					getDisplayDate("from");
+	  			}
+	  		});
+
+	  		$('#to').datepicker({
+	  			defaultDate: "+1w",
+	  			// numberOfMonths:3,
+	  			// showCurrentAtPos:1,
+	  			maxDate:0,
+	  			onSelect: function( selectedDate ) {
+	  				$( "#from" ).datepicker( "option", "maxDate", selectedDate );
+	  				getDisplayDate("to");
+	  			}
+	  		});
+			
+	  		function getDisplayDate ( type ) {
+	  			
+	  			if ( type == "from") {
+	  				var date = $("#from").datepicker("getDate"),
+	  					parsedDate = $.datepicker.formatDate("dd MM", date);
+	  				
+	  				$("#date-from").text( parsedDate );
+	  			}
+	  			else if ( type == "to" ){
+	  				var date = $("#to").datepicker("getDate"),
+	  					parsedDate = $.datepicker.formatDate("dd MM", date);
+
+	  				$("#date-to").text( parsedDate );
+	  			}
+	  			else {
+	  				//default date
+	  				var currentDate = new Date(),
+	  				t = $.datepicker.formatDate("dd MM", currentDate);
+	  				$("#date-to").text(t);
+	  		
+	  				var	last7Days = new Date(currentDate.setDate(currentDate.getDate()-7)),
+	  				f = $.datepicker.formatDate("dd MM", last7Days);
+	  				$("#date-from").text(f);
+	  				
+	  			}
+	  		}	
+
+	  		// function fetchData () {
+	  		// 	var f = $("#from").datepicker("getDate"),
+	  		// 		t = $("#to").datepicker("getDate");
+
+	  		// 	f = $.datepicker.formatDate("yymmdd", f);
+	  		// 	t = $.datepicker.formatDate("yymmdd", t);
+	  			
+	  		// 	var url = ''
+	  		// 	$.ajax({
+	  		// 		url 
+	  		// 	});
+
+
+
+	  		// }
+
+/************************************ Google Charts Functionalities *************************************
+
+		    google.setOnLoadCallback(drawPostPieChart);
+		    google.setOnLoadCallback(drawInteractionPieChart);
+
+		    function drawPostPieChart () {
+		    	var data = google.visualization.arrayToDataTable([
+		    		['Task', 'Hours per Day'],
+		    		['Facebook',     45],
+		    		['Twitter',     33],
+		    		['LinkedIn',    28]
+		    		]);
+
+		    	var options = {
+	  		      		title: 'NewzSocial Social Media Posts',
+	  		      		// title: null
+	  		      		// legend: 'none'
+	  		      	};
+
+	  		      	var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+	  		      	chart.draw(data, options);
+		    }
+
+		    function drawInteractionPieChart() {
+		    	var data = google.visualization.arrayToDataTable([
+		    		['Task', 'Hours per Day'],
+		    		['Facebook',     45],
+		    		['Twitter',     33],
+		    		['LinkedIn',    28]
+		    		]);
+
+		    	var options = {
+	  		      		title: 'NewzSocial Social Media Interactions',
+	  		      		// title: null
+	  		      		// legend: 'none'
+	  		      	};
+
+	  		      	var chart = new google.visualization.PieChart(document.getElementById('piechart2'));
+	  		      	chart.draw(data, options);
+	  		}
+
+	  		function drawVisualization() {
+		        // Some raw data (not necessarily accurate)
+		        var data = google.visualization.arrayToDataTable([
+		        	['Date', 	'Post',  'Click', 'Like/Favourite', 'Share/Retweet', 'Comment'],
+		        	['1 Feb',  1165,      938,       	998,           450,      614.6],
+		        	['2 Feb',  1135,      1120,       1268,          288,      682],
+		        	['2006/07',  1157,      1167,       807,           397,      623],
+		        	['2007/08',  1139,      1110,       968,           215,      609.4],
+		        	['2008/09',  1136,      691,        1026,          366,      569.6]
+		        	]);
+
+		        var options = {
+		        	title : 'Business Campaign Activity',
+		        	vAxis: {title: "Counts(#)"},
+		        	hAxis: {title: "Date"},
+		        	seriesType: "lines",
+		        	series: {1: {type: "bars"}}
+		        };
+
+		        var chart = new google.visualization.ComboChart(document.getElementById('combochart'));
+		        chart.draw(data, options);
+		    }
+		    google.setOnLoadCallback(drawVisualization);
+
+/************************* End of Google Charts, Start of High Charts **********************************/
+
+			// var chart1, chart2;
+		   	
+	    	// Build the chart
+	    	// $('#piechart').highcharts({
+
+	    	// 	chart1: {
+	    	// 		plotBackgroundColor: null,
+	    	// 		plotBorderWidth: null,
+	    	// 		plotShadow: false
+	    	// 	},
+	    	// 	title: {
+	    	// 		text: 'Social Network Posts'
+	    	// 	},
+	    	// 	tooltip: {
+	    	// 		pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	    	// 	},
+	    	// 	plotOptions: {
+	    	// 		pie: {
+	    	// 			allowPointSelect: true,
+	    	// 			cursor: 'pointer',
+	    	// 			dataLabels: {
+	    	// 				enabled: false
+	    	// 			},
+	    	// 			showInLegend: true
+	    	// 		}
+	    	// 	},
+	    	// 	series: [{
+	    	// 		type: 'pie',
+	    	// 		name: 'NewzSocial Posts',
+	    	// 		data: [
+	    	// 		['Facebook', 45.5],
+	    	// 		['Twitter', 33.9],
+	    	// 		['LinkedIn', 20.6]
+	    	// 		]
+	    	// 	}]
+	    	// });
+
+	    	// $('#piechart2').highcharts({
+
+	    	// 	chart1: {
+	    	// 		plotBackgroundColor: null,
+	    	// 		plotBorderWidth: null,
+	    	// 		plotShadow: false
+	    	// 	},
+	    	// 	title: {
+	    	// 		text: 'Social Network Interactions'
+	    	// 	},
+	    	// 	tooltip: {
+	    	// 		pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	    	// 	},
+	    	// 	plotOptions: {
+	    	// 		pie: {
+	    	// 			allowPointSelect: true,
+	    	// 			cursor: 'pointer',
+	    	// 			dataLabels: {
+	    	// 				enabled: false
+	    	// 			},
+	    	// 			showInLegend: true
+	    	// 		}
+	    	// 	},
+	    	// 	series: [{
+	    	// 		type: 'pie',
+	    	// 		name: 'NewzSocial Interactions',
+	    	// 		data: [
+	    	// 		['Facebook', 45.5],
+	    	// 		['Twitter', 33.9],
+	    	// 		['LinkedIn', 20.6]
+	    	// 		]
+	    	// 	}]
+
+	    	// });
+
+			$('#combochart').highcharts({
+	            chart: {
+	            },
+	            title: {
+	                text: 'Campaign Activity'
+	            },
+	            xAxis: {
+	                categories: ['31 Jan', '01 Feb', '02 Feb', '03 Feb', '04 Feb', '05 Feb', '06 Feb']
+	            },
+	            tooltip: {
+	                formatter: function() {
+	                    var s;
+	                    if (this.point.name) { // the pie chart
+	                        s = ''+
+	                            this.point.name +': '+ this.y +' fruits';
+	                    } else {
+	                        s = ''+
+	                            this.x  +': '+ this.y;
+	                    }
+	                    return s;
+	                }
+	            },
+	            // labels: {
+	            //     items: [{
+	            //         html: 'Total fruit consumption',
+	            //         style: {
+	            //             left: '40px',
+	            //             top: '8px',
+	            //             color: 'black'
+	            //         }
+	            //     }]
+	            // },
+	            series: [{
+	                type: 'column',
+	                name: 'Posts',
+	                data: [5, 10, 15, 20, 15, 10, 5]
+	            }, {
+	                type: 'spline',
+	                name: 'Clicks',
+	                data: [28, 46, 33, 66, 40, 37, 30]
+	            }, {
+	                type: 'spline',
+	                name: 'Likes/Favourites',
+	                data: [1, 0, 3, 5, 6, 5, 2]
+	            }, {
+	                type: 'spline',
+	                name: 'Shares/Retweets',
+	                data: [0, 0, 2, 4, 3, 1, 1]
+	                // marker: {
+	                // 	lineWidth: 2,
+	                // 	lineColor: Highcharts.getOptions().colors[3],
+	                // 	fillColor: 'white'
+	                // }
+	            }, {
+	            	type: 'spline',
+	            	name: 'Comments',
+	            	data: [10, 7, 8, 15, 13, 10, 7]
+	            }]
+	            // }, {
+	            //     type: 'pie',
+	            //     name: 'Total consumption',
+	            //     data: [{
+	            //         name: 'Jane',
+	            //         y: 13,
+	            //         color: Highcharts.getOptions().colors[0] // Jane's color
+	            //     }, {
+	            //         name: 'John',
+	            //         y: 23,
+	            //         color: Highcharts.getOptions().colors[1] // John's color
+	            //     }, {
+	            //         name: 'Joe',
+	            //         y: 19,
+	            //         color: Highcharts.getOptions().colors[2] // Joe's color
+	            //     }],
+	            //     center: [100, 80],
+	            //     size: 100,
+	            //     showInLegend: false,
+	            //     dataLabels: {
+	            //         enabled: false
+	            //     }
+	            // }]
+	        });
+
+/****************************************End of High Charts ***************************************/
+			buildCampaignTable();
+			buildUserTable();
+			buildSocialNetworkTable();
+
+			function buildCampaignTable () {
+				var t = "",
+				count = 0;
+
+				var tmpArray = ['Founder Vision', 'From The Expert', 'Product Insights', 'Announcements', 'Event', 'Best Practices', ];
+					// posts = [],
+					// clicks = [],
+					// cpp = [],
+					// likes = [],
+					// shares = [],
+					// comments = [];
+
+				for ( var i = 0; i < 6; i++ ) {
+					count ++;
+
+					t += "<tr>";
+					t += "<td>" + count + "</td>";
+					t += "<td>" + tmpArray[i] + "</td>";
+					t += "<td>123</td>";
+					t += "<td>80</td>";
+					t += "<td>12%</td>";
+					t += "<td>50</td>";
+					t += "<td>32</td>";
+					t += "<td>5</td>";
+					t += "</tr>";
+				}
+
+				$('#campaignTable > tbody').append(t);
+			}
+
+			function buildSocialNetworkTable () {
+				var t = "",
+				count = 0;
+
+				var tmpArray = ['Twitter', 'LinkedIn', 'Facebook', 'Google+'];
+					// posts = [],
+					// clicks = [],
+					// cpp = [],
+					// likes = [],
+					// shares = [],
+					// comments = [];
+
+				for ( var i = 0; i < 4; i++ ) {
+					count ++;
+
+					t += "<tr>";
+					t += "<td>" + count + "</td>";
+					t += "<td>" + tmpArray[i] +"</td>";
+					t += "<td>123</td>";
+					t += "<td>80</td>";
+					t += "<td>12%</td>";
+					t += "<td>50</td>";
+					t += "<td>32</td>";
+					t += "<td>5</td>";
+					t += "</tr>";
+				}
+
+				$('#socialNetworkTable > tbody').append(t);
+			}
+
+			function buildUserTable () {
+				var t = "",
+				count = 0;
+
+				var tmpArray = ['Scott Ollivier', 'Jeff Leroux', 'Bobby Keong' , 'Jin Zhe', 'Steve Sayman'];
+					// posts = [156, 132, 112, 98, 75],
+					// interactions = [ 372, 302, 257, 221, 157],
+					// clicks = [],
+					// cpp = [],
+					// likes = [],
+					// shares = [],
+					// comments = [],
+
+
+				for ( var i = 0; i < 5; i++ ) {
+					count ++;
+
+					t += "<tr>";
+					t += "<td>" + count + "</td>";
+					t += "<td>" + tmpArray[i] + "</td>";
+					t += "<td>123</td>";
+					t += "<td>80</td>";
+					t += "<td>80</td>";
+					t += "<td>12%</td>";
+					t += "<td>50</td>";
+					t += "<td>32</td>";
+					t += "<td>5</td>";
+					t += "</tr>";
+				}
+
+				$('#userTable > tbody').append(t);
+			}
+
+			var sparklineValue1 = [42,34,24], sparklineValue2 = [34,35,31], sparklineValue3 = [10, 10];
+			$('.piechart1').sparkline(sparklineValue1, {
+				type 	: 'pie',
+				width 	: '30%',
+				height	: '30%'
+			});
+
+			$('.piechart2').sparkline(sparklineValue2, {
+				type 	: 'pie',
+				width 	: '30%',
+				height 	: '30%'
+			});
+
+			$('.piechart3').sparkline(sparklineValue3, {
+				type 	: 'pie',
+				width 	: '30%',
+				height 	: '30%'
+			});
+
+
+		});
+
+	  	</script>
+
+	</head>
+
+	<body>
+
+		<section class="overview-section">
+
+			<div class="newzsocial-logo">
+				<img src="css/img/newzsocial.png">
+			</div>
+
+			<div class="date-select-container">
+				<span>Select Date Range:</span><br>
+				<input id="from" type="text" class="datepicker" placeholder="From">
+				<input id="to" type="text" class="datepicker" placeholder="To">
+			</div>
+			
+			<div class="date-display shadow-out">
+				<span id="date-from"></span>
+				<span> - </span>
+				<span id="date-to"></span>
+			</div>
+
+			<div class="overview-figure-container">
+
+				<div class=" overview-table shadow-out">
+				
+				<table style="width:100%">
+					<tbody>
+						<tr>
+							<td class="overview-figure-window">
+								
+<!-- 								<div class="left-table-column">
+									<span class="piechart1">Loading...</span>
+								</div> -->
+								<!-- <div class="right-table-column"> -->
+									<div>
+										Posts:
+									</div>
+									<div>
+										<span class="number">1253</span>
+										<span class="percentage up"><i class="fa fa-arrow-up"></i>0.05%</span>
+									</div>
+									<div class="sparkline-piechart">
+										<span class="piechart1">Loading...</span>
+									</div>
+								<!-- </div> -->
+								
+							</td>
+							
+							<td class="overview-figure-window">
+								<div>
+									Interactions:
+								</div>
+								
+								<div>
+									<span class="number">175</span>
+									<span class="percentage down"><i class="fa fa-arrow-down"></i>0.003%</span>
+								</div>
+								<div class="sparkline-piechart">
+									<span class="piechart2">Loading...</span>
+								</div>
+							</td>
+							
+							<td class="overview-figure-window">
+								<div>
+									Active Users:						
+								</div>
+								<div>
+									<span class="number">10/20</span>
+									<span class="percentage up"><i class="fa fa-arrow-up"></i>10%</span>
+								</div>
+								<div class="sparkline-piechart">
+									<span class="piechart3">Loading...</span>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				</div>
+
+			</div>
+<!-- 
+			<div class="overview-piechart-container">
+				<button type="button" class="btn btn-inverse" data-toggle="collapse" data-target="#piechartContainer">
+					Show Social Media Pie Charts
+				</button>
+
+				<div id="piechartContainer" class="collapse">
+					<table>
+						<tbody>
+							<tr>
+								<td class="overview-piechart-window">
+									<div id="piechart" class="piechart"></div>
+								</td>
+								<td class="overview-piechart-window">
+									<div id="piechart2" class="piechart"></div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div> -->
+
+<!-- 			<div id="pieChartAccordion" class="accordion">
+				<div class="accordion-group">
+
+					<div class="accordion-heading">
+						<a class="accordion-toggle" data-toggle="collapse" data-parent="#pieChartAccordion" href="#piechartAccordionBody">
+							Show Social Media Channels Pie Charts
+						</a>
+					</div>
+
+					<div id="piechartAccordionBody" class="accordion-body collapse in">
+						<div class="accordion-inner">
+							<table>
+								<tbody>
+									<tr>
+										<td class="overview-piechart-window">
+											<div id="piechart" class="piechart"></div>
+										</td>
+										<td class="overview-piechart-window">
+											<div id="piechart2" class="piechart"></div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+
+				</div>
+			</div> -->
+
+		</section>
+		
+		<section class="chart-section shadow-in">
+
+			<div class="charts-container">
+
+				<div class="btn-group mode-btn">
+					<button type="button" class="btn btn-default">Day</button>
+					<button type="button" class="btn btn-default">Week</button>
+					<button type="button" class="btn btn-default">Month</button>
+				</div>
+				
+				<div id="combochart" class="combochart"></div>
+
+			</div>
+		</section>
+
+		<section class="table-section">
+
+			<div class="performance-table-container">
+
+				<div class="tabbable"> <!-- Only required for left/right tabs -->
+					
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="#tab1" data-toggle="tab">Campaign Performance</a></li>
+						<li><a href="#tab2" data-toggle="tab">Social Network Performance</a></li>
+						<li><a href="#tab3" data-toggle="tab">Users Performance</a></li>
+					</ul>
+
+					<div class="tab-content">
+
+						<div class="tab-pane active" id="tab1">
+
+							<div class="campaign-table-container">
+
+								<table id="campaignTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Top 10 Campaigns</h4>
+									</thead>
+									<tbody class="campaign-table-body">
+										<tr>
+											<th class="metric-width table-header">#</th>
+											<th class="table-header">Campaign</th>
+											<th class="metric-width table-header">Posts</th>
+											<th class="metric-width table-header">Clicks</th>
+											<th class="metric-width table-header">Clicks/Posts</th>
+											<!-- <th>CPP(%)</th> -->
+											<th class="metric-width table-header">Likes/Favourites</th>
+											<th class="metric-width table-header">Shares/Retweets</th>
+											<th class="metric-width table-header">Comments</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+						
+						<div class="tab-pane" id="tab2">
+
+							<div class="social-network-table-container">
+
+								<table id="socialNetworkTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Social Network Performance Table</h4>
+									</thead>
+									<tbody class="social-network-table-body">
+										<tr>
+											<th class="metric-width table-header">#</th>
+											<th class="table-header">Social Network</th>
+											<th class="metric-width table-header">Posts</th>
+											<th class="metric-width table-header">Clicks</th>
+											<!-- <th>CPP(%)</th> -->
+											<th class="metric-width table-header">Clicks/Posts</th>
+											<th class="metric-width table-header">Likes/Favourites</th>
+											<th class="metric-width table-header">Shares/Retweets</th>
+											<th class="metric-width table-header">Comments</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+
+						<div class="tab-pane" id="tab3">
+
+							<div class="user-table-container">
+
+								<table id="userTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Top 10 Users</h4>
+									</thead>
+									<tbody>
+										<tr>
+											<th class="metric-width table-header">#</th>
+											<th class="table-header">User</th>
+											<th class="metric-width table-header">Posts</th>
+											<th class="metric-width table-header">Total Interactions</th>
+											<th class="metric-width table-header">Clicks</th>
+											<th class="metric-width table-header">Clicks/Posts</th>
+											<!-- <th>CPP(%)</th> -->
+											<th class="metric-width table-header">Likes</th>
+											<th class="metric-width table-header">Shares</th>
+											<th class="metric-width table-header">Comments</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+					
+					</div>
+				
+				</div>
+
+			</div>
+			
+<!-- 			<div class="user-table-container">
+				
+				<table id="userTable" class="table table-hover table-bordered">
+					<thead>
+						<h4>Top 10 Users Performance Table</h4>
+					</thead>
+					<tbody>
+						<tr>
+							<th>#</th>
+							<th>User</th>
+							<th>Posts</th>
+							<th>No. of Interaction</th>
+							<th>Clicks</th>
+							<th>CPP(%)</th>
+							<th>Likes</th>
+							<th>Shares</th>
+							<th>Comments</th>
+						</tr>
+					</tbody>
+				</table>
+
+			</div> -->
+
+		</section>
+
+	</body>
+
+</html>
