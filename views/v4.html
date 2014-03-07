@@ -9,7 +9,7 @@
 		<link rel="stylesheet" href="css/bootstrap-responsive.css" />
 		<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-		<link rel="stylesheet" type="text/css" href="css/new2.css" />
+		<link rel="stylesheet" type="text/css" href="css/new3.css" />
 
 		<!-- Bootstrap, jQuery and jQuery-UI -->
 		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -320,7 +320,7 @@
 
 	  				$('.piechart1').sparkline( val1[1], {
 	  					type 	: 'pie',
-	  					width 	: '60px',
+	  					width 	: '50px',
 	  					height	: '100%',
 	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
 	  					tooltipValueLookups: {
@@ -330,7 +330,7 @@
 
 	  				$('.piechart2').sparkline( val2[1], {
 	  					type 	: 'pie',
-	  					width 	: '60px',
+	  					width 	: '50px',
 	  					height 	: '100%',
 	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
 	  					tooltipValueLookups: {
@@ -340,7 +340,7 @@
 
 	  				$('.piechart3').sparkline( val3[1], {
 	  					type 	: 'pie',
-	  					width 	: '60px',
+	  					width 	: '50px',
 	  					height 	: '100%',
 	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
 	  					tooltipValueLookups: {
@@ -350,7 +350,7 @@
 
 	  				$('.piechart4').sparkline( val4[1], {
 	  					type 	: 'pie',
-	  					width 	: '60px',
+	  					width 	: '50px',
 	  					height	: '100%',
 	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
 	  					tooltipValueLookups: {
@@ -360,7 +360,7 @@
 
 	  				$('.piechart5').sparkline( val5[1], {
 	  					type 	: 'pie',
-	  					width 	: '60px',
+	  					width 	: '50px',
 	  					height 	: '100%',
 	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
 	  					tooltipValueLookups: {
@@ -547,7 +547,7 @@
 			</div>
 			
 			<div class="title-container">
-				<h3>Overview Report</h3>			
+				<h3>Performance Overview Report</h3>			
 			</div>
 			
 			<div class="date-select-container">
@@ -565,105 +565,166 @@
 				<h4>Activity and Impact Summary</h4>
 			</div>
 
-			<span class="activity-summary-container-title">Activity</span>
-			<span class="impact-summary-container-title">Impact</span>
-
 			<div class="summary-container">
-				
-				<div class="activity-summary-container">
 
-					<table class="activity-summary-table">
+				<div class="summary-table-container divider-btm">
+					
+					<table class="summary-table">
+						
 						<tbody>
 							<tr>
-								<td class="activity-col-50 divider">
-
-									<div id="postCount" class="activity-col-top"></div>
-									<div class="activity-col-bottom">
-
-										<div id="postPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up"></i>0.05%</span></div>
-
-										<div class="sparkline-piechart">
-											<span id="postPiechart" class="piechart1">Loading...</span>
-										</div>
-
-									</div>
-
-								</td>
-								<td class="activity-col-50">
-
-									<div id="userCount" class="activity-col-top">10/100 Users</div>
-									<div class="activity-col-bottom">
-										
-										<div id="userPercentage" class="percentage-display">
-											<span class="percentage up">--</span>
-										</div>
-
-										<div class="sparkline-piechart">
-											<span id="userPiechart" class="piechart2">Loading...</span>
-										</div>
-
-									</div>
-
-								</td>
-							</tr>
-						</tbody>
-					</table>
-
-				</div>
-
-				<div class="impact-summary-container">
-
-					<table class="impact-summary-table">
-						<tbody>
-							<tr>
-								<td class="impact-col-25 divider">
+								<td class="summary-col divider">
 									
-									<div id="clickCount" class="impact-col-top"></div>
-									<div class="impact-col-bottom">
-										
-										<div id="clickPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up"></i>0.03%</span></div>
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Posts:</div>
+													<div class="summary-col-left-btm">
+														<div class="metric-display">1,000</div>
+														<div id="postPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up arrow-margin"></i>0.05%</span></div>
+													</div>
 
-										<div class="sparkline-piechart">
-											<span id="clickPiechart" class="piechart3">Loading...</span>
-										</div>
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="postPiechart" class="piechart1">Loading...</span>
+														</div>
+													</div>
 
-									</div>
-
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
 								</td>
-								<td class="impact-col-25 divider">		
-								
-									<div id="clickRateCount" class="impact-col-top"></div>
-									<div class="impact-col-bottom">
-										
-										<div id="clickRatePercentage" class="percentage-display"><span class="percentage down"><i class="fa fa-arrow-down"></i>0.003%</span></div>
 
-										<div class="sparkline-piechart">
-											<span id="clickRatePiechart" class="piechart4">Loading...</span>
-										</div>
+								<td class="summary-col divider">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Users:</div>
+													<div class="summary-col-left-btm">
+														<div class="metric-display">10/100</div>
+														<div id="postPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up arrow-margin"></i>--</span></div>
+													</div>
 
-									</div>
-								
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="userPiechart" class="piechart2">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
 								</td>
-								<td class="impact-col-40">
-								
-									<div id="interactionCount" class="impact-col-top"></div>
-									<div class="impact-col-bottom">
-										
-										<div id="interactionPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up"></i>0.2%</span></div>
 
-										<div class="sparkline-piechart">
-											<span id="interactionPiechart" class="piechart5">Loading...</span>
-										</div>
+								<td class="summary-col divider">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Clicks:</div>
+													<div class="summary-col-left-btm">
+														<div class="metric-display">1,000</div>
+														<div id="postPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up arrow-margin"></i>0.05%</span></div>
+													</div>
 
-									</div>
-								
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="clickPiechart" class="piechart3">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
 								</td>
+
+								<td class="summary-col divider">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Click Rate:</div>
+													<div class="summary-col-left-btm">
+														<div class="metric-display">1,000</div>
+														<div id="postPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up arrow-margin"></i>0.05%</span></div>
+													</div>
+
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="clickRatePiechart" class="piechart4">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
+								</td>
+
+								<td class="summary-col">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Interactions:</div>
+													<div class="summary-col-left-btm">
+														<div class="metric-display">1,000</div>
+														<div id="postPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up arrow-margin"></i>0.05%</span></div>
+													</div>
+
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="interactionPiechart" class="piechart5">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
+								</td>
+
 							</tr>
 						</tbody>
+
 					</table>
 
 				</div>
-			
+				
 			</div>
 
 		</section>

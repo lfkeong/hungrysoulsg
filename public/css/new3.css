@@ -77,6 +77,79 @@
 	left: 5%;
 }
 
+/*************** v4 CSS *****************/
+
+.summary-container {
+	text-align: center;
+/*	padding: 10px 0px;*/
+	/*background-color: #ffffff;*/
+	/*width: 64%;*/
+}
+
+.summary-table-container {
+	width: 65%;
+	display: inline-block;
+	text-align: left;
+	padding: 10px;
+	background-color: #ffffff;
+}
+
+.summary-table {
+	background-color: white;
+	/*width: 50%;*/
+}
+
+.summary-col {
+	height: 70px;
+	width: 20%;
+}
+
+.panel-table {
+	width: 100%;
+}
+
+.col-left {
+	width: 60%;
+	padding-left: 10px;
+}
+
+.col-right {
+	width: 40%;
+}
+
+.summary-col-left-top {
+	height: 35%;
+	padding-bottom: 5px;
+}
+
+.summary-col-left-btm {
+	height: 65%;
+}
+
+.metric-display {
+	display: inline-block;
+	font-weight: bolder;
+	/*letter-spacing: 1px;*/
+	font-size: 30px;
+	margin: 5px 8px 8px 0px;
+}
+
+.piechart-position {
+	position: relative;
+	left: 25%;
+}
+
+.divider-btm {
+	border-bottom: 3px solid #bdbdbd;
+}
+
+.arrow-margin {
+	margin-right: 5px; 
+}
+
+/*************** v4 CSS ****************/
+
+
 .activity-summary-table, .impact-summary-table {
 	width: 100%;
 }
@@ -128,9 +201,9 @@
 }
 
 .percentage-display {
-	position: relative;
+/*	position: relative;
 	top: 25%;
-	width: 48%;
+	width: 48%;*/
 	display: inline-block;
 }
 
