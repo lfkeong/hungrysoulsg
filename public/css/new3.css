@@ -128,7 +128,7 @@
 
 .metric-display {
 	display: inline-block;
-	font-weight: bolder;
+	/*font-weight: bolder;*/
 	/*letter-spacing: 1px;*/
 	font-size: 30px;
 	margin: 5px 8px 8px 0px;
