@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+
+		<title>SMC - Overview Report</title>
+
+		<link rel="stylesheet" href="css/bootstrap.css" />
+		<link rel="stylesheet" href="css/bootstrap-responsive.css" />
+		<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="css/new2.css" />
+
+		<!-- Bootstrap, jQuery and jQuery-UI -->
+		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/bootstrap.js"></script>
+		<script type="text/javascript" src="js/jquery.sparkline.js"></script>
+
+		<!-- High Chart JavaScript -->
+		<script src="http://code.highcharts.com/highcharts.js"></script>
+		<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+		<!-- Custom JavaScript -->
+	  	<script type="text/javascript">
+
+	  		$( function () {
+
+	  			init();	//Initialization
+
+	  			var clicks = [28, 46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46];
+	  			var shares = [0, 0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0];
+	  			var likes  = [ 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0];
+	  			var comments = [10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7];
+	  			var posts = [5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10];
+	  			var dates = ["04 Feb","05 Feb","06 Feb","07 Feb","08 Feb","09 Feb","10 Feb","11 Feb","12 Feb","13 Feb","14 Feb","15 Feb","16 Feb","17 Feb","18 Feb","19 Feb","20 Feb","21 Feb","22 Feb","23 Feb","24 Feb","25 Feb","26 Feb","27 Feb","28 Feb","01 Mar","02 Mar","03 Mar","04 Mar","05 Mar"];
+
+
+	  			var val1 = [2,3,5];
+	  			var val2 = [1,9];
+	  			var val3 = [4,3,3];
+	  			var val4 = [3,5,2];
+	  			var val5 = [2,2,6];
+
+
+	  			/******************************* FUNCTIONS DECLARATION ****************************/
+	  			function init () {
+
+		  			//Initialize Datepickers
+		  			$('#from').datepicker({
+		  				// defaultDate: "+1w",
+		  				maxDate:0,
+		  				onSelect: function( selectedDate ) {
+		  					$( "#to" ).datepicker( "option", "minDate", selectedDate );
+		  					var date = getDateFromDatepicker();
+		  					fetchSummaryData( date );
+		  					fetchChartingDate( date );
+		  				}
+		  			});
+
+		  			$('#to').datepicker({
+		  				// defaultDate: "+1w",
+		  				maxDate:0,
+		  				onSelect: function( selectedDate ) {
+		  					$( "#from" ).datepicker( "option", "maxDate", selectedDate );
+		  					var date = getDateFromDatepicker();
+		  					fetchSummaryData( date );
+		  					fetchChartingDate( date );
+		  				}
+		  			});
+
+		  			//Pre-setting default date - 30 days
+					var last30Days = new Date(), currentDay = new Date();
+					var info = {
+						s : new Date(last30Days.setDate(last30Days.getDate()-30)),
+						e : currentDay
+					}
+		  			setDateForDatepicker( info );
+
+			  		//Initialize Summary Screen
+			  		fetchSummaryData( info );
+
+			  		//Initialize Charts/Graphs
+			  		fetchChartingDate( info );
+
+	  				//Initialize Tables
+	  				constructCampaignTable();
+	  				constructSocialNetworkTable();
+	  				constructContentTable();
+	  				constructUserTable();
+
+	  			}
+
+	  			/****************************** GENERAL FUNCTIONS ********************************/
+
+	  			function setDateForDatepicker ( date ) {
+
+	  				$( "#from" ).datepicker( "setDate", date.s );
+	  				$( "#to" ).datepicker( "setDate", date.e );
+	  			
+	  			}
+
+	  			function getDateFromDatepicker () {
+
+	  				var date = {};
+	  				date = {
+	  					s : $("#from").datepicker("getDate"),
+	  					e : $("#to").datepicker("getDate")
+	  				}
+
+	  				return date;
+	  			}
+
+	  			//Change date format
+	  			function parseDate ( type, date ) {
+
+	  				switch ( type ) {
+
+	  					case "input" : //Convert input date to APIs' date format
+
+	  						var parsedDate = {};
+		  					parsedDate.s = $.datepicker.formatDate("yymmdd", date.s); //20140215, 20140216, 20140217 
+		  					parsedDate.e = $.datepicker.formatDate("yymmdd", date.e);
+		  					return parsedDate;
+
+	  					break; 
+
+	  					case "output" : //Convert output date to different form
+
+	  						var parsedDate = [];
+
+	  						for ( var i = 0; i < date.length; i++ ) {
+	  							var tmp = $.datepicker.parseDate("yymmdd",date[i]);
+	  							parsedDate[i] = $.datepicker.formatDate("dd M", tmp); //1 Feb, 2 Feb, 3 Feb
+	  						}
+		  					return parsedDate;
+
+	  					break;
+	  				}
+	  			}
+
+	  			//Add commas for numbers that have more than 4 intergers
+	  			function addCommas ( nStr ) {
+
+	  				nStr += '';
+	  				x = nStr.split('.');
+	  				x1 = x[0];
+	  				x2 = x.length > 1 ? '.' + x[1] : '';
+	  				var rgx = /(\d+)(\d{3})/;
+	  				while (rgx.test(x1)) {
+	  					x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	  				}
+	  				return x1 + x2;
+	  			}
+
+	  			/************************************* SUMMARY SCREEN FUNCTIONS ****************************/
+
+	  			function fetchSummaryData ( date ) {	//Constructing activity and impact summary window
+
+					var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetBusinessOverview?businessId=42&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+
+	  						if ( response.status ) {
+
+	  							var previousStream, currentStream, previousTotalStream, currentTotalStream, 
+	  								pPosts = pUsers = pClicks = pClickrate = pInteractions = [];	//Sparkline-piechart variables declaration
+
+	  							previousStream = response.data.previous.stream;
+	  							currentStream = response.data.current.stream;
+
+	  							previousTotalStream  = previousStream[1];
+	  							currentTotalStream = currentStream[1];
+
+	  							//Sparkline-piechart tooltips defination
+	  							pUsers[0] = [['Active Users'],['Inactive Users']];
+	  							pUsers[1] = [ 4 , 6 ] // temporary fix - currently don't have user data yet
+	  							pPosts[0] = pClicks[0] = pClickrate[0] = pInteractions[0] = [['Twitter'],['Facebook'],['LinkedIn']];
+	  							pPosts[1] = pClicks[1] = pClickrate[1] = pInteractions[1] = []; //temporary fix - declare empty array for data
+
+	  							//Constructing sparkline-piechart data input
+	  							for ( var i = 2; i < 5; i++ ) {
+
+	  								switch ( currentStream[i][0] ) {
+
+	  									case 3:
+
+	  									pPosts[1][0] = currentStream[i][2];
+	  									pClicks[1][0] = currentStream[i][3];
+	  									pInteractions[1][0] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+
+	  									//Post can't be zero. If click == 0 -> click rate == 0. 
+	  									if ( pClicks[1][0] == 0 ) pClickrate[1][0] = 0;
+	  									else pClickrate[1][0] = ( pClicks[1][0] / pPosts[1][0] );
+	  									
+	  									break;
+
+	  									case 2:
+
+		  									pPosts[1][1] = currentStream[i][2];
+		  									pClicks[1][1] = currentStream[i][3];
+		  									pInteractions[1][1] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+
+		  									if ( pClicks[1][1] == 0 ) pClickrate[1][1] = 0;
+		  									else pClickrate[1][1] = ( pClicks[1][1] / pPosts[1][1] );
+	
+	  									break;
+
+
+
+	  									case 4:
+		  								
+		  									pPosts[1][2] = currentStream[i][2];
+		  									pClicks[1][2] = currentStream[i][3];
+		  									pInteractions[1][2] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+
+		  									if ( pClicks[1][2] == 0 ) pClickrate[1][2] = 0;
+		  									else pClickrate[1][2] = ( pClicks[1][2] / pPosts[1][2] );
+	  									
+	  									break;
+
+	  								}
+
+	  							}
+
+	  							// console.log(pPosts, pUsers, pClicks, pClickrate, pInteractions);
+	  							constructSparklinePiechart( pPosts, pUsers, pClicks, pClickrate, pInteractions );
+	  							displaySummaryWindow( previousTotalStream, currentTotalStream );
+	  							
+							}
+							else {
+								//return status = false
+								console.log(url);
+								console.log("GetBusinessOverview API failture, return status false");
+							}
+	  					},
+ 	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetBusinessOverview API failure, server error");
+	  					}
+	  				});
+	  			}
+
+	  			
+
+
+	  			function displaySummaryWindow ( previousTotalStream, currentTotalStream ) {
+
+	  				var prevPost = previousTotalStream[2],
+	  					prevClick = previousTotalStream[3],
+	  					curPost = currentTotalStream[2],
+	  					curClick = currentTotalStream[3],
+	  					prevTotalInteraction = previousTotalStream[3] + previousTotalStream[4] + previousTotalStream[5] + previousTotalStream[6];
+	  					curTotalInteraction = currentTotalStream[3] + currentTotalStream[4] + currentTotalStream[5] + currentTotalStream[6];
+
+	  				if ( prevClick == 0 ) var prevClickRate = 0;
+	  				else var prevClickRate = ( prevClick / prevPost );
+
+	  				if ( curClick == 0 ) var curClickRate = 0;
+	  				else var curClickRate = (curClick / curPost );
+
+	  		// 		$('#postPercentage').html( getPercentageDifference( curPost, prevPost ) );
+					// // $('#userPercentage').html();
+					// $('#clickPercentage').html( getPercentageDifference( curClick, prevClick ) );
+					// $('#clickRatePercentage').html( getPercentageDifference( curClickRate, prevClickRate ) );
+					// $('#interactionPercentage').html( getPercentageDifference( curTotalInteraction, prevTotalInteraction ) );
+
+					curPost = addCommas( curPost );
+					curClick = addCommas( curClick );
+					curClickRate = addCommas( curClickRate.toFixed(2) );
+					curTotalInteraction = addCommas( curTotalInteraction );
+
+					$('#postCount').text( curPost + " Posts" );
+					// $('#userCount').text();
+					$('#clickCount').text( curClick + " Clicks" );
+					$('#clickRateCount').text( curClickRate + " Click Rate" );
+					$('#interactionCount').text( curTotalInteraction + " Total Interactions" );
+
+	  			}
+
+	  			function getPercentageDifference ( current, previous ) {
+	  				var html, value;
+
+	  				console.log(current,previous);
+
+	  				if ( current > previous ) {
+
+	  					if( previous != 0 ) {
+	  						value = ( current - previous ) / previous * 100;
+	  						html = '<span class="percentage up"><i class="fa fa-arrow-up"></i>' + value + '%</span>';
+	  					}
+	  					else html = '<span class="percentage">start zero</span>'; //previously data is "zero"
+
+	  				} 
+	  				else if ( previous > current ) {
+
+	  					if ( current != 0 ) {
+	  						value = ( previous - current ) / previous * 100;
+	  						html = '<span class="percentage down"><i class="fa fa-arrow-down"></i>' + value + '%</span>';
+	  					}
+	  					else html = '<span class="percentage">go zero</span>'; //current data is "zero"
+
+	  				}
+	  				else {
+	  					//previous == current -> no difference.
+	  					html = '<span class="percentage up"><i class="fa fa-arrow-up"></i>';
+	  					html += '0%</span>'
+	  				}
+	  				
+	  				return html;
+	  			}
+
+	  			function constructSparklinePiechart ( val1, val2, val3, val4, val5 ) {
+
+	  				$('.piechart1').sparkline( val1[1], {
+	  					type 	: 'pie',
+	  					width 	: '60px',
+	  					height	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val1[0]
+	  					}
+	  				});
+
+	  				$('.piechart2').sparkline( val2[1], {
+	  					type 	: 'pie',
+	  					width 	: '60px',
+	  					height 	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val2[0]
+	  					}
+	  				});
+
+	  				$('.piechart3').sparkline( val3[1], {
+	  					type 	: 'pie',
+	  					width 	: '60px',
+	  					height 	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val3[0]
+	  					}
+	  				});
+
+	  				$('.piechart4').sparkline( val4[1], {
+	  					type 	: 'pie',
+	  					width 	: '60px',
+	  					height	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val4[0]
+	  					}
+	  				});
+
+	  				$('.piechart5').sparkline( val5[1], {
+	  					type 	: 'pie',
+	  					width 	: '60px',
+	  					height 	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val5[0]
+	  					}
+	  				});
+
+	  			}
+
+	  			/************************************ CHARTING FUNCTIONS ***********************************/
+
+	  			function fetchChartingDate ( date ) {	//Charting daily line chart and column chart
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetDailyStream?businessId=42&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							var dates = [], clicks = [], shares = [], likes = [], comments = [], posts = [];
+
+	  							for ( var i = 1; i < response.data.stream.length; i++ ) {
+	  								var dailyStream = response.data.stream;
+
+	  								dates.push( dailyStream[i][0] );
+	  								posts.push( dailyStream[i][1] );
+	  								clicks.push( dailyStream[i][2] );
+	  								likes.push( dailyStream[i][3] );
+	  								shares.push( dailyStream[i][4] );
+	  								comments.push( dailyStream[i][5] );
+	  							}
+	  							dates = parseDate( "output", dates );
+	  							console.log( dates );
+
+	  							// constructLineChart( dates, clicks, shares, likes, comments );
+	  							// constructColumnChart( dates, posts );
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetDailyStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetDailyStream API failure, server error");
+ 	  					}
+ 	  				});
+	  			}
+
+	  			// For Shastri Fake Data
+	  			constructLineChart( dates, clicks, shares, likes, comments );
+	  			constructColumnChart( dates, posts );
+
+	  			function constructLineChart( dates, clicks, shares, likes, comments ) {
+	  				$('#linechart').highcharts({
+	  					title: {
+	  						text: null
+			                // x: -20 //center
+			            },
+			            subtitle: {
+			            	// text: 'Source: WorldClimate.com',
+			            	// x: -20
+			            },
+			            xAxis: {
+			            	type: 'datetime',
+			            	categories: dates
+			            },
+			            yAxis: {
+			            	title: {
+			            		text: 'Impact (#)'
+			            	},
+			            	plotLines: [{
+			            		value: 0,
+			            		width: 1,
+			            		color: '#808080'
+			            	}]
+			            },
+			            tooltip: {
+			            	xDateFormat: '%m-%d',
+			            	shared: true
+			            	// valueSuffix: '°C'
+			            },
+			            // legend: {
+			            // 	layout: 'vertical',
+			            // 	align: 'right',
+			            // 	verticalAlign: 'middle',
+			            // 	borderWidth: 0
+			            // },
+			            series: [{
+			            	name: 'Clicks',
+			            	data: clicks
+			            }, {
+			            	name: 'Shares/Retweets',
+			            	data: shares
+			            }, {
+			            	name: 'Likes/Favourites',
+			            	data: likes
+			            }, {
+			            	name: 'Comments',
+			            	data: comments
+			            }]
+			        });
+	  			}
+
+	  			function constructColumnChart ( dates, posts ) {
+
+	  				$('#columnchart').highcharts({
+				        chart: {
+				            type: 'column'
+				        },
+				        title: {
+				            text: null
+				        },
+				        subtitle: {
+				            // text: 'Source: WorldClimate.com'
+				        },
+				        xAxis: {
+				            categories: dates
+				        },
+				        yAxis: {
+				            min: 0,
+				            title: {
+				                text: 'Activity (#)'
+				            }
+				        },
+				        tooltip: {
+				            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+				            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+				                '<td style="padding:0"><b>{point.y}</b></td></tr>',
+				            footerFormat: '</table>',
+				            shared: true,
+				            useHTML: true
+				        },
+				        plotOptions: {
+				            column: {
+				                pointPadding: 0.2,
+				                borderWidth: 0
+				            }
+				        },
+				        series: [{
+				            name: 'Posts',
+				            data: posts
+
+				        }]
+				    });
+
+	  			}
+
+	  			/************************************* TABLES FUNCTIONS *************************************/
+
+	  			function constructCampaignTable () {
+
+	  			}
+
+	  			function constructSocialNetworkTable () {
+
+	  			}
+
+	  			function constructContentTable () {
+
+	  			}
+
+	  			function constructUserTable () {
+
+	  			}
+
+	  		});
+
+	  	</script>
+
+	</head>
+	
+	<body>
+
+		<section class="header-section">
+			
+			<div class="title-container">
+				<h3>Overview Report</h3>			
+			</div>
+			
+			<div class="date-select-container">
+				<span>Select Date Range:</span><br>
+				<input id="from" type="text" class="datepicker">
+				<span> to </span>
+				<input id="to" type="text" class="datepicker">
+			</div>
+
+		</section>
+
+		<section class="summary-section shadow-out">
+			
+			<div>
+				<h4>Activity and Impact Summary</h4>
+			</div>
+
+			<span class="activity-summary-container-title">Activity</span>
+			<span class="impact-summary-container-title">Impact</span>
+
+			<div class="summary-container">
+				
+				<div class="activity-summary-container">
+
+					<table class="activity-summary-table">
+						<tbody>
+							<tr>
+								<td class="activity-col-50 divider">
+
+									<div id="postCount" class="activity-col-top"></div>
+									<div class="activity-col-bottom">
+
+										<div id="postPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up"></i>0.05%</span></div>
+
+										<div class="sparkline-piechart">
+											<span id="postPiechart" class="piechart1">Loading...</span>
+										</div>
+
+									</div>
+
+								</td>
+								<td class="activity-col-50">
+
+									<div id="userCount" class="activity-col-top">10/100 Users</div>
+									<div class="activity-col-bottom">
+										
+										<div id="userPercentage" class="percentage-display">
+											<span class="percentage up">--</span>
+										</div>
+
+										<div class="sparkline-piechart">
+											<span id="userPiechart" class="piechart2">Loading...</span>
+										</div>
+
+									</div>
+
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+
+				<div class="impact-summary-container">
+
+					<table class="impact-summary-table">
+						<tbody>
+							<tr>
+								<td class="impact-col-25 divider">
+									
+									<div id="clickCount" class="impact-col-top"></div>
+									<div class="impact-col-bottom">
+										
+										<div id="clickPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up"></i>0.03%</span></div>
+
+										<div class="sparkline-piechart">
+											<span id="clickPiechart" class="piechart3">Loading...</span>
+										</div>
+
+									</div>
+
+								</td>
+								<td class="impact-col-25 divider">		
+								
+									<div id="clickRateCount" class="impact-col-top"></div>
+									<div class="impact-col-bottom">
+										
+										<div id="clickRatePercentage" class="percentage-display"><span class="percentage down"><i class="fa fa-arrow-down"></i>0.003%</span></div>
+
+										<div class="sparkline-piechart">
+											<span id="clickRatePiechart" class="piechart4">Loading...</span>
+										</div>
+
+									</div>
+								
+								</td>
+								<td class="impact-col-40">
+								
+									<div id="interactionCount" class="impact-col-top"></div>
+									<div class="impact-col-bottom">
+										
+										<div id="interactionPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up"></i>0.2%</span></div>
+
+										<div class="sparkline-piechart">
+											<span id="interactionPiechart" class="piechart5">Loading...</span>
+										</div>
+
+									</div>
+								
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+			
+			</div>
+
+		</section>
+
+		<section class="chart-section shadow-in">
+
+			<div>
+				<h4>Trends</h4>
+			</div>
+			
+			<div class="charts-container">
+
+				<div class="btn-group mode-btn">
+					<button type="button" class="btn btn-default">Day</button>
+					<button type="button" class="btn btn-default">Week</button>
+					<button type="button" class="btn btn-default">Month</button>
+				</div>
+				
+				<div id="linechart" class="linechart"></div>
+				<div id="columnchart" class="columnchart"></div>
+
+			</div>
+
+		</section>
+		
+		<section class="table-section">
+
+		<div class="social-network-select-container">
+				<span> Social Network:</span>
+
+				<select id="businessSelector">
+					<option value="1">All</option>
+					<option value="2">Facebook</option>
+					<option value="3">Twitter</option>
+					<option value="4">LinkedIn</option>
+				</select>
+
+			</div>		
+
+			<div class="campaign-table-container">
+
+				<table id="campaignTable" class="table table-hover table-bordered">
+					<thead>
+						<h4>Campaign Performance Summary</h4>
+					</thead>
+					<tbody class="campaign-table-body table-table-body">
+						<tr>
+							<th>Campaign</th>
+							<th class="m-width">Destination</th>
+							<th class="m-width">Posts</th>
+							<th class="m-width">Clicks</th>
+							<th class="m-width">Clicks Rate</th>
+							<th class="m-width">Shares/ Retweets</th>
+							<th class="m-width">Amplification Rate</th>
+							<th class="m-width">Likes/ Faves</th>
+							<th class="m-width">Applause Rate</th>
+							<th class="m-width">Comments</th>
+							<th class="m-width">Conversion Rate</th>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+
+			<div class="social-network-table-container">
+
+				<table id="socialNetworkTable" class="table table-hover table-bordered">
+					<thead>
+						<h4>Social Network Summary</h4>
+					</thead>
+					<tbody class="social-network-table-body table-table-body">
+						<tr>
+							<th>Social Network</th>
+							<th class="m-width">Posts</th>
+							<th class="m-width">Clicks</th>
+							<th class="m-width">Clicks Rate</th>
+							<th class="m-width">Shares/Retweets</th>
+							<th class="m-width">Amplification Rate</th>
+							<th class="m-width">Likes/Favesurites</th>
+							<th class="m-width">Applause Rate</th>
+							<th class="m-width">Comments</th>
+							<th class="m-width">Conversion Rate</th>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+
+			
+			<div class="content-table-container">
+				
+				<table id="contentTable" class="table table-hover table-bordered">
+					<thead>
+						<h4>Top Content</h4>
+					</thead>
+					<tbody class="top-content-table-body table-table-body">
+						<tr>
+							<th>Title</th>
+							<th class="m-width">Posts</th>
+							<th class="m-width">Clicks</th>
+							<th class="m-width">Clicks Rate</th>
+							<th class="m-width">Shares/Retweets</th>
+							<th class="m-width">Amplification Rate</th>
+							<th class="m-width">Likes/Favesurites</th>
+							<th class="m-width">Applause Rate</th>
+							<th class="m-width">Comments</th>
+							<th class="m-width">Conversion Rate</th>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+			
+			<div class="user-table-container">
+
+				<table id="userTable" class="table table-hover table-bordered">
+					<thead>
+						<h4>Top Users</h4>
+					</thead>
+					<tbody class="top-user-table-body table-table-body">
+						<tr>
+							<th>User</th>
+							<th class="m-width">Posts</th>
+							<th class="m-width">Clicks</th>
+							<th class="m-width">Clicks Rate</th>
+							<th class="m-width">Shares/Retweets</th>
+							<th class="m-width">Amplification Rate</th>
+							<th class="m-width">Likes/Favesurites</th>
+							<th class="m-width">Applause Rate</th>
+							<th class="m-width">Comments</th>
+							<th class="m-width">Conversion Rate</th>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+
+		</section>
+
+	</body>
+
+</html>
