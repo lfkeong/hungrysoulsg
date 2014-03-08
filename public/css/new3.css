@@ -292,6 +292,11 @@
 	/*text-align: right;*/
 	float: right;
 	font-weight: bold;
+
+}
+
+.inline {
+	display: inline-block;
 }
 
 .table-section {
