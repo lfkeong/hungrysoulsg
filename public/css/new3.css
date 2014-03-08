@@ -32,7 +32,7 @@
 /*	Summary Section	*/
 
 .summary-section {
-	background-color: #f2f2f2;
+	/*background-color: #f2f2f2;*/
 	/*height: 100px;*/
 	padding: 20px;
 }
@@ -127,7 +127,7 @@
 }
 
 .metric-display {
-	display: inline-block;
+	/*display: inline-block;*/
 	/*font-weight: bolder;*/
 	/*letter-spacing: 1px;*/
 	font-size: 30px;
@@ -140,11 +140,21 @@
 }
 
 .divider-btm {
-	border-bottom: 3px solid #bdbdbd;
+	/*border-bottom: 3px solid #bdbdbd;*/
+/*	border: 3px solid #bdbdbd;
+	border-top:none;*/
+}
+
+.divider-left {
+	border-left: 1px solid #bdbdbd;
 }
 
 .arrow-margin {
 	margin-right: 5px; 
+}
+
+.btn {
+	font-size: 10px !important;
 }
 
 /*************** v4 CSS ****************/
@@ -213,7 +223,7 @@
 }
 
 .percentage {
-	font-weight: bold;
+	/*font-weight: bold;*/
 }
 
 .up {
@@ -227,36 +237,46 @@
 /*	Chart Section	*/
 
 .chart-section {
-	border-top: 1px solid #bdbdbd;
-	background-color: #f2f2f2;
+	/*border-top: 1px solid #bdbdbd;*/
+	/*background-color: #f2f2f2;*/
 	padding: 20px;
-}
-
-.charts-container {	
+	padding-top: 0px;
 	text-align: center;
 }
 
+.charts-container {
+	padding: 10px;
+	width: 80%;
+	display: inline-block;
+}
+
 .mode-btn {
+	text-align: right;
 	margin-bottom: 10px;
 	display: block;
 }
 
 .linechart {
 	width: 1240px;
-	height: 400px;
+	height: 300px;
 	display: inline-block;
+	margin-bottom: 64px;
+
 }
 
 .columnchart {
 	width: 1240px;
-	height: 200px;
+	height: 150px;
 	display: inline-block;
 }
 
 .shadow-out {
-  -moz-box-shadow:    3px 3px 5px 6px #ccc;
+/*  -moz-box-shadow:    3px 3px 5px 6px #ccc;
   -webkit-box-shadow: 3px 3px 5px 6px #ccc;
-  box-shadow:         3px 3px 5px 6px #ccc;
+  box-shadow:         3px 3px 5px 6px #ccc;*/
+/*    -moz-box-shadow:    3px 3px 5px 6px #ccc;
+  -webkit-box-shadow: 3px 3px 5px 6px #ccc;*/
+  box-shadow:         0px 0px 10px #bdbdb0;
 }
 
 .shadow-in {
@@ -269,14 +289,24 @@
 /*	Table Section	*/
 
 .social-network-select-container {
-	text-align: right;
+	/*text-align: right;*/
+	float: right;
 	font-weight: bold;
 }
 
 .table-section {
-	border-top: 1px solid #bdbdbd;
+	/*border-top: 1px solid #bdbdbd;*/
 	/*background-color: #f2f2f2;*/
 	padding: 20px;
+	padding-top: 0px;
+	text-align: center;
+
+}
+
+.table-container {
+	display: inline-block;
+	text-align: left;
+	width: 1100px;
 }
 
 .m-width {

@@ -33,8 +33,8 @@
 	  			var likes  = [ 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0];
 	  			var comments = [10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7];
 	  			var posts = [5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10];
-	  			var dates = ["04 Feb","05 Feb","06 Feb","07 Feb","08 Feb","09 Feb","10 Feb","11 Feb","12 Feb","13 Feb","14 Feb","15 Feb","16 Feb","17 Feb","18 Feb","19 Feb","20 Feb","21 Feb","22 Feb","23 Feb","24 Feb","25 Feb","26 Feb","27 Feb","28 Feb","01 Mar","02 Mar","03 Mar","04 Mar","05 Mar"];
-
+	  			// var dates = ["04 Feb","05 Feb","06 Feb","07 Feb","08 Feb","09 Feb","10 Feb","11 Feb","12 Feb","13 Feb","14 Feb","15 Feb","16 Feb","17 Feb","18 Feb","19 Feb","20 Feb","21 Feb","22 Feb","23 Feb","24 Feb","25 Feb","26 Feb","27 Feb","28 Feb","01 Mar","02 Mar","03 Mar","04 Mar","05 Mar"];
+	  			var dates = [1392451200000, 1391673600000, 1391760000000, 1391846400000, 1391932800000, 1392019200000, 1392105600000, 1392192000000, 1392278400000, 1392364800000, 1392451200000, 1392537600000, 1392624000000, 1392710400000, 1392796800000, 1392883200000, 1392969600000, 1393056000000, 1393142400000, 1393228800000, 1393315200000, 1393401600000, 1393488000000, 1393574400000, 1393660800000, 1393747200000, 1393833600000, 1393920000000, 1394006400000, 1394092800000, 1394179200000, 1394265600000];
 
 	  			var val1 = [2,3,5];
 	  			var val2 = [1,9];
@@ -318,6 +318,9 @@
 
 	  			function constructSparklinePiechart ( val1, val2, val3, val4, val5 ) {
 
+	  				//temporary fix
+	  				val2 = [["Active","Inactive"],[1,9]]
+
 	  				$('.piechart1').sparkline( val1[1], {
 	  					type 	: 'pie',
 	  					width 	: '50px',
@@ -416,8 +419,9 @@
 	  			}
 
 	  			// For Shastri Fake Data
-	  			constructLineChart( dates, clicks, shares, likes, comments );
-	  			constructColumnChart( dates, posts );
+	  			// constructLineChart( dates, clicks, shares, likes, comments );
+	  			// constructColumnChart( dates, posts );
+	  			constructCombineChart( dates, posts, clicks, shares, likes,comments);
 
 	  			function constructLineChart( dates, clicks, shares, likes, comments ) {
 	  				$('#linechart').highcharts({
@@ -431,9 +435,13 @@
 			            },
 			            xAxis: {
 			            	type: 'datetime',
-			            	categories: dates
+			            	categories: dates,
+			            	labels: {
+			            		enabled: false
+			            	}
 			            },
 			            yAxis: {
+			            	min: 0,
 			            	title: {
 			            		text: 'Impact (#)'
 			            	},
@@ -448,12 +456,21 @@
 			            	shared: true
 			            	// valueSuffix: '°C'
 			            },
-			            // legend: {
-			            // 	layout: 'vertical',
-			            // 	align: 'right',
-			            // 	verticalAlign: 'middle',
-			            // 	borderWidth: 0
+			            // labels: {
+			            // 	items: [{
+			            // 		html: "testing 1",
+			            // 		style: {
+			            // 			top: "10px"
+			            // 		}
+			            // 	}]
 			            // },
+			            legend: {
+			            	// floating: true,
+			            	// layout: 'vertical',
+			            	// align: 'right',
+			            	verticalAlign: 'top',
+			            	// borderWidth: 0
+			            },
 			            series: [{
 			            	name: 'Clicks',
 			            	data: clicks
@@ -483,6 +500,7 @@
 				            // text: 'Source: WorldClimate.com'
 				        },
 				        xAxis: {
+				        	type: 'datetime',
 				            categories: dates
 				        },
 				        yAxis: {
@@ -490,6 +508,9 @@
 				            title: {
 				                text: 'Activity (#)'
 				            }
+				        },
+				        legend: {
+				        	enabled : false 
 				        },
 				        tooltip: {
 				            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
@@ -512,6 +533,128 @@
 				        }]
 				    });
 
+	  			}
+	  			// HighChart default color --> http://jsfiddle.net/JfVHr/1/
+	  			function constructCombineChart ( dates, posts, clicks, shares, likes, comments ) {
+	  				 $('#container').highcharts({
+			            chart: {
+			            },
+			            title: {
+			                text: null
+			            },
+			            xAxis: {
+			            	type: 'datetime',
+			            	categories: dates,
+			            	labels: {
+			            		formatter: function () {
+			            			var tmp = $.datepicker.parseDate("@", this.value);
+			            			var d = $.datepicker.formatDate("dd M", tmp);
+		            				return d;
+			            		}
+			            	}			                
+			            },
+			            yAxis: {
+			            	title : {
+			            		text: null
+			            	}
+			            },
+			            tooltip: {
+			            	xDateFormat: '%A, %b %d, %Y',
+			            	shared: true
+			            	// valueSuffix: '°C'
+			            },
+			            // tooltip: {
+			            //     formatter: function() {
+			            //         var s;
+			            //         if (this.point.name) { // the pie chart
+			            //             s = ''+
+			            //                 this.point.name +': '+ this.y +' fruits';
+			            //         } else {
+			            //             s = ''+
+			            //                 this.x  +': '+ this.y;
+			            //         }
+			            //         return s;
+			            //     }
+			            // },
+			            exporting: {
+			            	enabled: false
+			            },
+			            // labels: {
+			            //     items: [{
+			            //         html: 'Total fruit consumption',
+			            //         style: {
+			            //             left: '40px',
+			            //             top: '8px',
+			            //             color: 'black'
+			            //         }
+			            //     }]
+			            // },
+			            series: [{
+			                type: 'column',
+			                name: 'Posts',
+			                data: posts
+			            }, {
+			                type: 'line',
+			                name: 'Clicks',
+			                data: clicks
+			                // marker: {
+			                // 	lineWidth: 2,
+			                // 	lineColor: Highcharts.getOptions().colors[3],
+			                // 	fillColor: 'white'
+			                // }
+			            }, {
+			                type: 'line',
+			                name: 'Shares',
+			                data: shares
+			                // marker: {
+			                // 	lineWidth: 2,
+			                // 	lineColor: Highcharts.getOptions().colors[3],
+			                // 	fillColor: 'white'
+			                // }
+			            }, {
+			                type: 'line',
+			                name: 'Likes',
+			                data: likes
+			                // marker: {
+			                // 	lineWidth: 2,
+			                // 	lineColor: Highcharts.getOptions().colors[3],
+			                // 	fillColor: 'white'
+			                // }
+			            }, {
+			                type: 'line',
+			                name: 'Comments',
+			                data: comments
+			                // marker: {
+			                // 	lineWidth: 2,
+			                // 	lineColor: Highcharts.getOptions().colors[3],
+			                // 	fillColor: 'white'
+			                // }
+			            }
+			            //,{
+			            //     type: 'pie',
+			            //     name: 'Total consumption',
+			            //     data: [{
+			            //         name: 'Jane',
+			            //         y: 13,
+			            //         color: Highcharts.getOptions().colors[0] // Jane's color
+			            //     }, {
+			            //         name: 'John',
+			            //         y: 23,
+			            //         color: Highcharts.getOptions().colors[1] // John's color
+			            //     }, {
+			            //         name: 'Joe',
+			            //         y: 19,
+			            //         color: Highcharts.getOptions().colors[2] // Joe's color
+			            //     }],
+			            //     center: [100, 80],
+			            //     size: 100,
+			            //     showInLegend: false,
+			            //     dataLabels: {
+			            //         enabled: false
+			            //     }
+			            // }
+			            ]
+			        });
 	  			}
 
 	  			/************************************* TABLES FUNCTIONS *************************************/
@@ -559,11 +702,11 @@
 
 		</section>
 
-		<section class="summary-section shadow-out">
+		<section class="summary-section">
 			
-			<div>
+<!-- 			<div>
 				<h4>Activity and Impact Summary</h4>
-			</div>
+			</div> -->
 
 			<div class="summary-container">
 
@@ -573,7 +716,7 @@
 						
 						<tbody>
 							<tr>
-								<td class="summary-col divider">
+								<td class="summary-col divider divider-left">
 									
 									<table class="panel-table">
 										<tbody>
@@ -609,10 +752,10 @@
 											<tr>
 												<td class="col-left">
 													
-													<div class="summary-col-left-top">Users:</div>
+													<div class="summary-col-left-top">Active Users:</div>
 													<div class="summary-col-left-btm">
 														<div class="metric-display">10/100</div>
-														<div id="postPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up arrow-margin"></i>--</span></div>
+														<div id="postPercentage" class="percentage-display"><span class="percentage up">--</span></div>
 													</div>
 
 												</td>
@@ -689,7 +832,7 @@
 									
 								</td>
 
-								<td class="summary-col">
+								<td class="summary-col divider">
 									
 									<table class="panel-table">
 										<tbody>
@@ -731,9 +874,9 @@
 
 		<section class="chart-section">
 
-			<div>
+<!-- 			<div>
 				<h4>Trends</h4>
-			</div>
+			</div> -->
 			
 			<div class="charts-container">
 
@@ -743,8 +886,9 @@
 					<button type="button" class="btn btn-default">Month</button>
 				</div>
 				
-				<div id="linechart" class="linechart"></div>
-				<div id="columnchart" class="columnchart"></div>
+				<div id="container" style="width: 100%; height: 400px; margin: 0 auto"></div>
+<!-- 				<div id="linechart" class="linechart shadow-out"></div>
+				<div id="columnchart" class="columnchart shadow-out"></div> -->
 
 			</div>
 
@@ -752,113 +896,147 @@
 		
 		<section class="table-section">
 
-		<div class="social-network-select-container">
-				<span> Social Network:</span>
-
-				<select id="businessSelector">
-					<option value="1">All</option>
-					<option value="2">Facebook</option>
-					<option value="3">Twitter</option>
-					<option value="4">LinkedIn</option>
-				</select>
-
-			</div>		
-
-			<div class="campaign-table-container">
-
-				<table id="campaignTable" class="table table-hover table-bordered">
-					<thead>
-						<h4>Campaign Performance Summary</h4>
-					</thead>
-					<tbody class="campaign-table-body table-table-body">
-						<tr>
-							<th>Campaign</th>
-							<th class="m-width">Destination</th>
-							<th class="m-width">Posts</th>
-							<th class="m-width">Clicks</th>
-							<th class="m-width">Clicks Rate</th>
-							<th class="m-width">Shares/ Retweets</th>
-							<th class="m-width">Amplification Rate</th>
-							<th class="m-width">Likes/ Faves</th>
-							<th class="m-width">Applause Rate</th>
-							<th class="m-width">Comments</th>
-							<th class="m-width">Conversion Rate</th>
-						</tr>
-					</tbody>
-				</table>
-
-			</div>
-
-			<div class="social-network-table-container">
-
-				<table id="socialNetworkTable" class="table table-hover table-bordered">
-					<thead>
-						<h4>Social Network Summary</h4>
-					</thead>
-					<tbody class="social-network-table-body table-table-body">
-						<tr>
-							<th>Social Network</th>
-							<th class="m-width">Posts</th>
-							<th class="m-width">Clicks</th>
-							<th class="m-width">Clicks Rate</th>
-							<th class="m-width">Shares/Retweets</th>
-							<th class="m-width">Amplification Rate</th>
-							<th class="m-width">Likes/Favesurites</th>
-							<th class="m-width">Applause Rate</th>
-							<th class="m-width">Comments</th>
-							<th class="m-width">Conversion Rate</th>
-						</tr>
-					</tbody>
-				</table>
-
-			</div>
-
-			
-			<div class="content-table-container">
+			<div class="table-container">
 				
-				<table id="contentTable" class="table table-hover table-bordered">
-					<thead>
-						<h4>Top Content</h4>
-					</thead>
-					<tbody class="top-content-table-body table-table-body">
-						<tr>
-							<th>Title</th>
-							<th class="m-width">Posts</th>
-							<th class="m-width">Clicks</th>
-							<th class="m-width">Clicks Rate</th>
-							<th class="m-width">Shares/Retweets</th>
-							<th class="m-width">Amplification Rate</th>
-							<th class="m-width">Likes/Favesurites</th>
-							<th class="m-width">Applause Rate</th>
-							<th class="m-width">Comments</th>
-							<th class="m-width">Conversion Rate</th>
-						</tr>
-					</tbody>
-				</table>
+				<div class="tabbable"> <!-- Only required for left/right tabs -->
+					
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="#tab1" data-toggle="tab">Campaign Performance Summary</a></li>
+						<li><a href="#tab2" data-toggle="tab">Social Network Summary</a></li>
+						<li><a href="#tab3" data-toggle="tab">Top Content</a></li>
+						<li><a href="#tab4" data-toggle="tab">Top User</a></li>
+					</ul>
 
-			</div>
-			
-			<div class="user-table-container">
+					<div class="tab-content">
 
-				<table id="userTable" class="table table-hover table-bordered">
-					<thead>
-						<h4>Top Users</h4>
-					</thead>
-					<tbody class="top-user-table-body table-table-body">
-						<tr>
-							<th>User</th>
-							<th class="m-width">Posts</th>
-							<th class="m-width">Clicks</th>
-							<th class="m-width">Clicks Rate</th>
-							<th class="m-width">Shares/Retweets</th>
-							<th class="m-width">Amplification Rate</th>
-							<th class="m-width">Likes/Favesurites</th>
-							<th class="m-width">Applause Rate</th>
-							<th class="m-width">Comments</th>
-							<th class="m-width">Conversion Rate</th>
-						</tr>
-					</tbody>
-				</table>
+						<div class="tab-pane active" id="tab1">
+
+							<div class="campaign-table-container">
+
+								<table id="campaignTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Campaign Performance Summary</h4>
+
+										<div class="social-network-select-container">
+											<span> Social Network:</span>
+
+											<select id="businessSelector">
+												<option value="1">All</option>
+												<option value="2">Facebook</option>
+												<option value="3">Twitter</option>
+												<option value="4">LinkedIn</option>
+											</select>
+
+										</div>
+									</thead>
+									<tbody class="campaign-table-body table-table-body">
+										<tr>
+											<th>Campaign</th>
+											<th class="m-width">Destination</th>
+											<th class="m-width">Posts</th>
+											<th class="m-width">Clicks</th>
+											<th class="m-width">Clicks Rate</th>
+											<th class="m-width">Shares/ Retweets</th>
+											<th class="m-width">Amplification Rate</th>
+											<th class="m-width">Likes/ Favorites</th>
+											<th class="m-width">Applause Rate</th>
+											<th class="m-width">Comments</th>
+											<th class="m-width">Conversion Rate</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+						
+						<div class="tab-pane" id="tab2">
+
+							<div class="social-network-table-container">
+
+								<table id="socialNetworkTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Social Network Summary</h4>
+									</thead>
+									<tbody class="social-network-table-body table-table-body">
+										<tr>
+											<th>Social Network</th>
+											<th class="m-width">Posts</th>
+											<th class="m-width">Clicks</th>
+											<th class="m-width">Clicks Rate</th>
+											<th class="m-width">Shares/Retweets</th>
+											<th class="m-width">Amplification Rate</th>
+											<th class="m-width">Likes/Favorites</th>
+											<th class="m-width">Applause Rate</th>
+											<th class="m-width">Comments</th>
+											<th class="m-width">Conversion Rate</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+
+						<div class="tab-pane" id="tab3">
+
+							<div class="content-table-container">
+
+								<table id="contentTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Top Content</h4>
+									</thead>
+									<tbody class="top-content-table-body table-table-body">
+										<tr>
+											<th>Title</th>
+											<th class="m-width">Posts</th>
+											<th class="m-width">Clicks</th>
+											<th class="m-width">Clicks Rate</th>
+											<th class="m-width">Shares/Retweets</th>
+											<th class="m-width">Amplification Rate</th>
+											<th class="m-width">Likes/Favorites</th>
+											<th class="m-width">Applause Rate</th>
+											<th class="m-width">Comments</th>
+											<th class="m-width">Conversion Rate</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+
+						<div class="tab-pane" id="tab4">
+
+							<div class="user-table-container">
+
+								<table id="userTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Top Users</h4>
+									</thead>
+									<tbody class="top-user-table-body table-table-body">
+										<tr>
+											<th>User</th>
+											<th class="m-width">Posts</th>
+											<th class="m-width">Clicks</th>
+											<th class="m-width">Clicks Rate</th>
+											<th class="m-width">Shares/Retweets</th>
+											<th class="m-width">Amplification Rate</th>
+											<th class="m-width">Likes/Favorites</th>
+											<th class="m-width">Applause Rate</th>
+											<th class="m-width">Comments</th>
+											<th class="m-width">Conversion Rate</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+					
+					</div>
+				
+				</div>
 
 			</div>
 
