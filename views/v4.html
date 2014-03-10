@@ -660,20 +660,143 @@
 	  			/************************************* TABLES FUNCTIONS *************************************/
 
 	  			function constructCampaignTable () {
+	  				var t = "";
 
+	  				var tmpArray = ['Founder Vision', 'From The Expert', 'Product Insights', 'Announcements', 'Event', 'Best Practices'];
+	  				var tmpArray2 = ['Facebook', 'Twitter', 'LinkedIn', 'Twitter', 'LinkedIn', 'Facebook'];
+					var posts = [123, 118, 105, 97, 89, 75],
+					clicks = [80,65,59,47,35,28],
+					clickRate = [5.4,3.3,4.7,4.5,2.8,3.2],
+					shares = [50, 43, 48, 32, 27, 22],
+					ampRate = [5.4,3.3,4.7,4.5,2.8,3.2],
+					likes = [156, 146, 148, 132, 116, 109],
+					appRate = [5.4,3.3,4.7,4.5,2.8,3.2],
+					comments = [56, 46, 58, 32, 86, 77],
+					convRate = [5.4,3.3,4.7,4.5,2.8,3.2];
+
+					for ( var i = 0; i < 6; i++ ) {
+
+						t += "<tr>";
+						t += "<td>" + tmpArray[i] + "</td>";
+						t += "<td>" + tmpArray2[i] + "</td>";
+						t += "<td>" + posts[i] + "</td>";
+						t += "<td>" + clicks[i] + "</td>";
+						t += "<td>" + clickRate[i] + "%</td>";
+						t += "<td>" + shares[i] + "</td>";
+						t += "<td>" + ampRate[i] + "%</td>";
+						t += "<td>" + likes[i] + "</td>";
+						t += "<td>" + appRate[i] + "%</td>";
+						t += "<td>" + comments[i] + "</td>";
+						t += "<td>" + convRate[i] + "%</td>";
+						t += "</tr>";
+					}
+
+					$('#campaignTable > tbody').append(t);
 	  			}
 
 	  			function constructSocialNetworkTable () {
+	  				var t = "";
 
+	  				var tmpArray = ['Twitter', 'LinkedIn', 'Facebook', 'Google+'];
+					var posts = [123, 97, 89, 75],
+					clicks = [80,47,35,28],
+					clickRate = [5.4,4.5,2.8,3.2],
+					shares = [50, 32, 27, 22],
+					ampRate = [5.4,4.5,2.8,3.2],
+					likes = [156, 132, 116, 109],
+					appRate = [5.4,4.5,2.8,3.2],
+					comments = [56, 46, 86, 77],
+					convRate = [5.4,3.3,2.8,3.2];
+
+					for ( var i = 0; i < 4; i++ ) {
+
+						t += "<tr>";
+						t += "<td>" + tmpArray[i] + "</td>";
+						t += "<td>" + posts[i] + "</td>";
+						t += "<td>" + clicks[i] + "</td>";
+						t += "<td>" + clickRate[i] + "%</td>";
+						t += "<td>" + shares[i] + "</td>";
+						t += "<td>" + ampRate[i] + "%</td>";
+						t += "<td>" + likes[i] + "</td>";
+						t += "<td>" + appRate[i] + "%</td>";
+						t += "<td>" + comments[i] + "</td>";
+						t += "<td>" + convRate[i] + "%</td>";
+						t += "</tr>";
+					}
+
+					$('#socialNetworkTable > tbody').append(t);
 	  			}
 
 	  			function constructContentTable () {
+	  				var t = "";
 
+	  				var tmpArray = [
+	  					"[Infographic] The Best Apps For B2B And B2C Social Media Marketing",
+	  					"Social Business Requires Social Employees",
+	  					"A List of 22 Social Media Management Tools",
+	  					"The Power of Content Marketing to Optimize Your Audience",
+	  					"Is This The Social Media Marketing Tipping Point?"
+	  				];
+					var posts = [123, 105, 97, 89, 75],
+					clicks = [80,65,47,35,28],
+					clickRate = [5.4,4.7,4.5,2.8,3.2],
+					shares = [50, 43, 32, 27, 22],
+					ampRate = [5.4,3.3,4.5,2.8,3.2],
+					likes = [156, 146, 132, 116, 109],
+					appRate = [5.4,4.7,4.5,2.8,3.2],
+					comments = [56, 58, 32, 86, 77],
+					convRate = [5.4,3.3,4.5,2.8,3.2];
+
+					for ( var i = 0; i < 5; i++ ) {
+
+						t += "<tr>";
+						t += "<td>" + tmpArray[i] + "</td>";
+						t += "<td>" + posts[i] + "</td>";
+						t += "<td>" + clicks[i] + "</td>";
+						t += "<td>" + clickRate[i] + "%</td>";
+						t += "<td>" + shares[i] + "</td>";
+						t += "<td>" + ampRate[i] + "%</td>";
+						t += "<td>" + likes[i] + "</td>";
+						t += "<td>" + appRate[i] + "%</td>";
+						t += "<td>" + comments[i] + "</td>";
+						t += "<td>" + convRate[i] + "%</td>";
+						t += "</tr>";
+					}
+					$('#contentTable > tbody').append(t);
 	  			}
 
 	  			function constructUserTable () {
+	  				var t = "";
 
-	  			}
+	  				var tmpArray = ['Scott Ollivier', 'Jeff Leroux', 'Bobby Keong' , 'Jin Zhe', 'Steve Sayman'];
+										var posts = [123, 105, 97, 89, 75],
+					clicks = [80,65,47,35,28],
+					clickRate = [5.4,4.7,4.5,2.8,3.2],
+					shares = [50, 43, 32, 27, 22],
+					ampRate = [5.4,3.3,4.5,2.8,3.2],
+					likes = [156, 146, 132, 116, 109],
+					appRate = [5.4,4.7,4.5,2.8,3.2],
+					comments = [56, 58, 32, 86, 77],
+					convRate = [5.4,3.3,4.5,2.8,3.2];
+
+					for ( var i = 0; i < 5; i++ ) {
+
+						t += "<tr>";
+						t += "<td>" + tmpArray[i] + "</td>";
+						t += "<td>" + posts[i] + "</td>";
+						t += "<td>" + clicks[i] + "</td>";
+						t += "<td>" + clickRate[i] + "%</td>";
+						t += "<td>" + shares[i] + "</td>";
+						t += "<td>" + ampRate[i] + "%</td>";
+						t += "<td>" + likes[i] + "</td>";
+						t += "<td>" + appRate[i] + "%</td>";
+						t += "<td>" + comments[i] + "</td>";
+						t += "<td>" + convRate[i] + "%</td>";
+						t += "</tr>";
+					}
+
+					$('#userTable > tbody').append(t);
+				}
 
 	  		});
 
