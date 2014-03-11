@@ -28,19 +28,37 @@
 
 	  			init();	//Initialization
 
-	  			var clicks = [28, 46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46];
-	  			var shares = [0, 0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0];
-	  			var likes  = [ 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0];
-	  			var comments = [10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7];
-	  			var posts = [5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10];
+	  			var clicks = [46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46, 33, 66, 40, 37, 30, 28, 46];
+	  			var shares = [0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0, 2, 4, 3, 1, 1, 0, 0];
+	  			var likes  = [0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0, 3, 5, 6, 5, 2, 1, 0];
+	  			var comments = [7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7, 8, 15, 13, 10, 7, 10, 7];
+	  			var posts = [10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10, 15, 20, 15, 10, 5, 5, 10];
 	  			// var dates = ["04 Feb","05 Feb","06 Feb","07 Feb","08 Feb","09 Feb","10 Feb","11 Feb","12 Feb","13 Feb","14 Feb","15 Feb","16 Feb","17 Feb","18 Feb","19 Feb","20 Feb","21 Feb","22 Feb","23 Feb","24 Feb","25 Feb","26 Feb","27 Feb","28 Feb","01 Mar","02 Mar","03 Mar","04 Mar","05 Mar"];
-	  			var dates = [1392451200000, 1391673600000, 1391760000000, 1391846400000, 1391932800000, 1392019200000, 1392105600000, 1392192000000, 1392278400000, 1392364800000, 1392451200000, 1392537600000, 1392624000000, 1392710400000, 1392796800000, 1392883200000, 1392969600000, 1393056000000, 1393142400000, 1393228800000, 1393315200000, 1393401600000, 1393488000000, 1393574400000, 1393660800000, 1393747200000, 1393833600000, 1393920000000, 1394006400000, 1394092800000, 1394179200000, 1394265600000];
+	  			var dates = [1391673600000, 1391760000000, 1391846400000, 1391932800000, 1392019200000, 1392105600000, 1392192000000, 1392278400000, 1392364800000, 1392451200000, 1392537600000, 1392624000000, 1392710400000, 1392796800000, 1392883200000, 1392969600000, 1393056000000, 1393142400000, 1393228800000, 1393315200000, 1393401600000, 1393488000000, 1393574400000, 1393660800000, 1393747200000, 1393833600000, 1393920000000, 1394006400000, 1394092800000];
 
 	  			var val1 = [2,3,5];
 	  			var val2 = [1,9];
 	  			var val3 = [4,3,3];
 	  			var val4 = [3,5,2];
 	  			var val5 = [2,2,6];
+
+	  			var weekDate,
+	  			weekClicks,
+	  			weekShares,
+	  			weekLikes,
+	  			weekComments,
+	  			weekPosts;
+
+	  			var monthDate,
+	  			monthClicks,
+	  			monthShares,
+	  			monthLikes,
+	  			monthComments,
+	  			monthPosts;
+
+	  			switchWeek(dates, clicks, shares, likes, comments, posts);
+	  			switchMonth(dates, clicks, shares, likes, comments, posts); 
+
 
 
 	  			/******************************* FUNCTIONS DECLARATION ****************************/
@@ -152,6 +170,214 @@
 	  				}
 	  				return x1 + x2;
 	  			}
+
+	  			function switchDay () {
+
+	  			}
+
+	  			// console.log( weekClicks, weekShares, weekLikes,	weekComments, weekPosts);
+	  			function switchWeek ( dates, clicks, shares, likes, comments, posts ) {
+
+	  				//getting week index
+	  				var testing = []
+
+	  				for (var i = 0; i < dates.length; i++) { 
+
+	  					var tmp = $.datepicker.iso8601Week(new Date(dates[i]));
+	  					testing.push(tmp);
+
+	  				}
+
+	  				//get x-axis
+	  				var test2 = unique(testing);
+	  				weekDate = test2;
+
+	  				//getting count of each particular week
+	  				var count = [];
+	  				for ( var i = 0; i < test2.length; i++ ) {
+	  					var dataCount = 0;
+	  					for ( var j = 0; j < testing.length; j++ ) {
+	  						
+	  						if (test2[i] == testing[j]) {
+	  							dataCount++;
+	  						}
+
+	  					}
+	  					count.push(dataCount); 
+	  				}
+
+	  				//aggregating data
+  					weekClicks = aggregateData(count, clicks);
+  					weekShares = aggregateData(count, shares);
+  					weekLikes = aggregateData(count, likes);
+  					weekComments = aggregateData(count, comments);
+  					weekPosts = aggregateData(count, posts);
+
+	  			console.log( weekClicks);
+
+	  			}
+
+	  			$('#testing').click( function () {
+	  				constructCombineChart( dates, posts, clicks, shares, likes,comments);
+	  			});
+	  			$('#testing1').click( function () {
+	  				constructWeekCombineChart ( weekDate, weekPosts, weekClicks, weekShares, weekLikes,weekComments);
+	  			});
+
+	  			$('#testing2').click( function () {
+	  				// constructMonthCombineChart ( monthDate, monthPosts, monthClicks, monthShares, monthLikes,monthComments);
+	  			});
+
+
+	  			function constructMonthCombineChart ( dates, posts, clicks, shares, likes, comments ) {
+	  				$('#container').highcharts({
+			            chart: {
+			            },
+			            title: {
+			                text: null
+			            },
+			            xAxis: {
+			            	categories: dates,  
+			            },
+			            yAxis: {
+			            	title : {
+			            		text: null
+			            	}
+			            },
+			            tooltip: {
+			            	// xDateFormat: '%A, %b %d, %Y',
+			            	shared: true
+			            },
+
+			            exporting: {
+			            	enabled: false
+			            },
+
+			            series: [{
+			                type: 'column',
+			                name: 'Posts',
+			                data: posts
+			            }, {
+			                type: 'line',
+			                name: 'Clicks',
+			                data: clicks
+
+			            }, {
+			                type: 'line',
+			                name: 'Shares',
+			                data: shares
+	
+			            }, {
+			                type: 'line',
+			                name: 'Likes',
+			                data: likes
+
+			            }, {
+			                type: 'line',
+			                name: 'Comments',
+			                data: comments
+
+			            }
+
+			            ]
+			        });
+	  			}
+
+	  			function constructWeekCombineChart ( dates, posts, clicks, shares, likes, comments ) {
+	  				 $('#container').highcharts({
+			            chart: {
+			            },
+			            title: {
+			                text: null
+			            },
+			            xAxis: {
+			            	categories: dates,  
+			            },
+			            yAxis: {
+			            	title : {
+			            		text: null
+			            	}
+			            },
+			            tooltip: {
+			            	// xDateFormat: '%A, %b %d, %Y',
+			            	shared: true
+			            },
+
+			            exporting: {
+			            	enabled: false
+			            },
+
+			            series: [{
+			                type: 'column',
+			                name: 'Posts',
+			                data: posts
+			            }, {
+			                type: 'line',
+			                name: 'Clicks',
+			                data: clicks
+
+			            }, {
+			                type: 'line',
+			                name: 'Shares',
+			                data: shares
+	
+			            }, {
+			                type: 'line',
+			                name: 'Likes',
+			                data: likes
+
+			            }, {
+			                type: 'line',
+			                name: 'Comments',
+			                data: comments
+
+			            }
+
+			            ]
+			        });
+	  			}
+
+
+	  			function aggregateData ( count, data ) {
+	  				var newData = [];
+	  				var i = 0;
+
+	  				for ( var j = 0; j < count.length; j++ ) {
+	  					var tmp = 0; var tmp2 = i;
+	  					for ( ; i < (tmp2 + count[j]); i++ ) {
+	  						if ( tmp != null ) tmp += data[i];
+	  					}
+	  					newData.push(tmp);
+	  				}
+	 				console.log(newData);
+
+	  				return newData;
+	  			}
+
+	  			function switchMonth () {
+
+	  			}
+
+	  			function contains ( each, comparison ) {
+	  				for ( var i = 0; i < comparison.length; i++ ) {
+	  					if ( comparison[i] == each ) {
+	  						return true;
+	  					}
+	  				}
+	  				return false;
+	  			}
+
+	  			function unique ( arrays ) {
+	  				var arr = []
+
+	  				for ( var i = 0; i < arrays.length; i++ ) {
+	  					if (!contains(arrays[i], arr)) {
+	  						arr.push(arrays[i]);
+	  					}
+	  				}
+	  				return arr;
+	  			}
+
 
 	  			/************************************* SUMMARY SCREEN FUNCTIONS ****************************/
 
@@ -1004,9 +1230,9 @@
 			<div class="charts-container">
 
 				<div class="btn-group mode-btn">
-					<button type="button" class="btn btn-default">Day</button>
-					<button type="button" class="btn btn-default">Week</button>
-					<button type="button" class="btn btn-default">Month</button>
+					<button id="testing" type="button" class="btn btn-default">Day</button>
+					<button id="testing1" type="button" class="btn btn-default">Week</button>
+					<button id="testing2" type="button" class="btn btn-default">Month</button>
 				</div>
 				
 				<div id="container" style="width: 100%; height: 400px; margin: 0 auto"></div>
