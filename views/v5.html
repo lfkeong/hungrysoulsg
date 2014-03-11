@@ -45,7 +45,11 @@
 		  					$( "#to" ).datepicker( "option", "minDate", selectedDate );
 		  					var date = getDateFromDatepicker();
 		  					fetchSummaryData( date, businessId );
-		  					fetchChartingDate( date, businessId );
+		  					fetchChartingData( date, businessId );
+		  					constructCampaignTable( date, businessId );
+		  					constructSocialNetworkTable( date, businessId );
+		  					constructContentTable( date, businessId );
+		  					constructUserTable( date, businessId );
 		  				}
 		  			});
 
@@ -56,7 +60,11 @@
 		  					$( "#from" ).datepicker( "option", "maxDate", selectedDate );
 		  					var date = getDateFromDatepicker();
 		  					fetchSummaryData( date, businessId );
-		  					fetchChartingDate( date, businessId );
+		  					fetchChartingData( date, businessId );
+		  					constructCampaignTable( date, businessId );
+		  					constructSocialNetworkTable( date, businessId );
+		  					constructContentTable( date, businessId );
+		  					constructUserTable( date, businessId );
 		  				}
 		  			});
 
@@ -72,13 +80,13 @@
 			  		fetchSummaryData( info, businessId );
 
 			  		//Initialize Charts/Graphs
-			  		fetchChartingDate( info, businessId );
+			  		fetchChartingData( info, businessId );
 
 	  				//Initialize Tables
-	  				constructCampaignTable();
-	  				constructSocialNetworkTable();
-	  				constructContentTable();
-	  				constructUserTable();
+	  				// constructCampaignTable( info, businessId );
+	  				// constructSocialNetworkTable( info, businessId );
+	  				// constructContentTable( info, businessId );
+	  				// constructUserTable( info, businessId );
 
 	  			}
 
@@ -122,7 +130,8 @@
 
 	  						for ( var i = 0; i < date.length; i++ ) {
 	  							var tmp = $.datepicker.parseDate("yymmdd",date[i]);
-	  							parsedDate[i] = $.datepicker.formatDate("dd M", tmp); //1 Feb, 2 Feb, 3 Feb
+	  							parsedDate[i] = $.datepicker.formatDate("@", tmp); //unix timestamp
+	  							parsedDate[i] = +parsedDate[i]; //converting number string to integer (highchart format)
 	  						}
 		  					return parsedDate;
 
@@ -297,7 +306,7 @@
 	  			function getPercentageDifference ( current, previous ) {
 	  				var html, value;
 
-	  				console.log(current,previous);
+	  				// console.log(current,previous);
 
 	  				if ( current > previous ) {
 
@@ -329,9 +338,7 @@
 	  			}
 
 	  			function constructSparklinePiechart ( val1, val2, val3, val4, val5 ) {
-	  				console.log(val1, val2, val3, val4, val5)
-	  				//temporary fix
-	  				val2 = [["Active","Inactive"],[1,9]]
+	  				// console.log(val1, val2, val3, val4, val5)
 
 	  				$('.piechart1').sparkline( val1[1], {
 	  					type 	: 'pie',
@@ -387,7 +394,7 @@
 
 	  			/************************************ CHARTING FUNCTIONS ***********************************/
 
-	  			function fetchChartingDate ( date, businessId ) {	//Charting daily line chart and column chart
+	  			function fetchChartingData ( date, businessId ) {	//Charting daily line chart and column chart
 
 	  				var inputDate = parseDate( "input", date );
 
@@ -456,34 +463,10 @@
 			            tooltip: {
 			            	xDateFormat: '%A, %b %d, %Y',
 			            	shared: true
-			            	// valueSuffix: '°C'
 			            },
-			            // tooltip: {
-			            //     formatter: function() {
-			            //         var s;
-			            //         if (this.point.name) { // the pie chart
-			            //             s = ''+
-			            //                 this.point.name +': '+ this.y +' fruits';
-			            //         } else {
-			            //             s = ''+
-			            //                 this.x  +': '+ this.y;
-			            //         }
-			            //         return s;
-			            //     }
-			            // },
 			            exporting: {
 			            	enabled: false
 			            },
-			            // labels: {
-			            //     items: [{
-			            //         html: 'Total fruit consumption',
-			            //         style: {
-			            //             left: '40px',
-			            //             top: '8px',
-			            //             color: 'black'
-			            //         }
-			            //     }]
-			            // },
 			            series: [{
 			                type: 'column',
 			                name: 'Posts',
@@ -501,36 +484,47 @@
 			                type: 'line',
 			                name: 'Shares',
 			                data: shares
-			                // marker: {
-			                // 	lineWidth: 2,
-			                // 	lineColor: Highcharts.getOptions().colors[3],
-			                // 	fillColor: 'white'
-			                // }
 			            }, {
 			                type: 'line',
 			                name: 'Likes',
 			                data: likes
-			                // marker: {
-			                // 	lineWidth: 2,
-			                // 	lineColor: Highcharts.getOptions().colors[3],
-			                // 	fillColor: 'white'
-			                // }
 			            }, {
 			                type: 'line',
 			                name: 'Comments',
 			                data: comments
-			                // marker: {
-			                // 	lineWidth: 2,
-			                // 	lineColor: Highcharts.getOptions().colors[3],
-			                // 	fillColor: 'white'
-			                // }
 			            }]
 			        });
 	  			}
 
 	  			/************************************* TABLES FUNCTIONS *************************************/
 
-	  			function constructCampaignTable () {
+	  			function constructCampaignTable ( date, businessId ) {
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							
+
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetDailyStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetDailyStream API failure, server error");
+ 	  					}
+ 	  				});
+
 	  				var t = "";
 
 	  				var tmpArray = ['Founder Vision', 'From The Expert', 'Product Insights', 'Announcements', 'Event', 'Best Practices'];
@@ -566,6 +560,33 @@
 	  			}
 
 	  			function constructSocialNetworkTable () {
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							
+
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetDailyStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetDailyStream API failure, server error");
+ 	  					}
+ 	  				});
+
+
 	  				var t = "";
 
 	  				var tmpArray = ['Twitter', 'LinkedIn', 'Facebook', 'Google+'];
@@ -599,6 +620,32 @@
 	  			}
 
 	  			function constructContentTable () {
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							
+
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetDailyStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetDailyStream API failure, server error");
+ 	  					}
+ 	  				});
+
 	  				var t = "";
 
 	  				var tmpArray = [
@@ -637,6 +684,32 @@
 	  			}
 
 	  			function constructUserTable () {
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							
+
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetDailyStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetDailyStream API failure, server error");
+ 	  					}
+ 	  				});
+
 	  				var t = "";
 
 	  				var tmpArray = ['Scott Ollivier', 'Jeff Leroux', 'Bobby Keong' , 'Jin Zhe', 'Steve Sayman'];
@@ -849,7 +922,7 @@
 													<div class="summary-col-left-top">Interactions:</div>
 													<div class="summary-col-left-btm">
 														<div id="interactionCount" class="metric-display"></div>
-														<div id="interactionPercentage" class="percentage-display"><span class="percentage up"><i class="fa fa-arrow-up arrow-margin"></i>0.05%</span></div>
+														<div id="interactionPercentage" class="percentage-display"></div>
 													</div>
 
 												</td>
