@@ -83,10 +83,9 @@
 			  		fetchChartingData( info, businessId );
 
 	  				//Initialize Tables
-	  				// constructCampaignTable( info, businessId );
-	  				// constructSocialNetworkTable( info, businessId );
+	  				constructCampaignTable( info, businessId );
 	  				// constructContentTable( info, businessId );
-	  				// constructUserTable( info, businessId );
+	  				constructUserTable( info, businessId );
 
 	  			}
 
@@ -166,6 +165,9 @@
 	  					url 	: url, 
 	  					type 	: "GET",
 	  					success : function ( response ) {
+
+	  						//pass the same data to construct Social Network Table
+	  						constructSocialNetworkTable( response );
 
 	  						if ( response.status ) {
 
@@ -419,7 +421,7 @@
 	  								comments.push( dailyStream[i][5] );
 	  							}
 	  							dates = parseDate( "output", dates );
-	  							console.log( dates );
+	  							// console.log( dates );
 
 	  							constructCombineChart( dates, posts, clicks, shares, likes,comments);
   							}
@@ -510,60 +512,147 @@
 	  					type 	: "GET",
 	  					success : function ( response ) {
 	  						if ( response.status ) {
-	  							
+	  							var stream, campaignArray = [], destination = [],
+	  								posts = [], clicks = [], likes = [], shares = [], comments = [],
+	  								cRate = [], ampRate = [], appRate = [], convRate = [];
+
+	  							stream = response.data.stream;
+
+  								for ( var i = 1; i < stream.length; i++ ) {
+
+  									destination.push("N.A");
+  									campaignArray.push(stream[i][1]);
+  									posts.push(stream[i][2]);
+  									clicks.push(stream[i][3]);
+  									likes.push(stream[i][4]);
+  									shares.push(stream[i][5]);
+  									comments.push(stream[i][6]);
+
+  								}
+
+  								for( var i = 0; i < posts.length; i++ ) {
+
+  									if ( posts[i] !== 0 ) {
+  										cRate.push( (clicks[i] / posts[i]).toFixed(2) + "%");
+  										ampRate.push( (shares[i] / posts[i]).toFixed(2) + "%");
+  										appRate.push( (likes[i] / posts[i]).toFixed(2) + "%");
+  										convRate.push( (comments[i] / posts[i]).toFixed(2) + "%");	
+  									}
+  									else {
+  										cRate.push("N.A");
+  										ampRate.push("N.A");
+  										appRate.push("N.A");
+  										convRate.push("N.A");	
+  									}
+
+  								}
+
+  								var t = "";
+
+  								for ( var i = 0; i < campaignArray.length; i++ ) {
+
+  									t += "<tr>";
+  									t += "<td>" + campaignArray[i] + "</td>";
+  									t += "<td>" + destination[i] + "</td>";
+  									t += "<td>" + posts[i] + "</td>";
+  									t += "<td>" + clicks[i] + "</td>";
+  									t += "<td>" + cRate[i] + "</td>";
+  									t += "<td>" + shares[i] + "</td>";
+  									t += "<td>" + ampRate[i] + "</td>";
+  									t += "<td>" + likes[i] + "</td>";
+  									t += "<td>" + appRate[i] + "</td>";
+  									t += "<td>" + comments[i] + "</td>";
+  									t += "<td>" + convRate[i] + "</td>";
+  									t += "</tr>";
+  								}
+
+  								$('#campaignTable > tbody').append(t);
 
   							}
   							else {
 	  							//return status = false
 	  							console.log(url);
-	  							console.log("GetDailyStream API failture, return status false");
+	  							console.log("GetCampaignStream API failture, return status false");
 	  						}
 	  					},
 	  					error 	: function () {
  	  						//server error
- 	  						console.log("GetDailyStream API failure, server error");
+ 	  						console.log("GetCampaignStream API failure, server error");
  	  					}
  	  				});
+	  			}
+
+	  			function constructSocialNetworkTable ( response ) {
+
+	  				var currentStream, socialMediaArray = ['Twitter', 'Facebook', 'LinkedIn']
+	  				posts = [], clicks = [], likes = [], shares = [], comments = [],
+	  				cRate = [], ampRate = [], appRate = [], convRate = [];
+
+	  				facebookStream = response.data.current.stream[2];
+	  				linkedinStream = response.data.current.stream[3];
+	  				twitterStream = response.data.current.stream[4];
+
+	  				posts.push(twitterStream[2]);
+	  				clicks.push(twitterStream[3]);
+	  				likes.push(twitterStream[4]);
+	  				shares.push(twitterStream[5]);
+	  				comments.push(twitterStream[6]);
+
+	  				posts.push(facebookStream[2]);
+	  				clicks.push(facebookStream[3]);
+	  				likes.push(facebookStream[4]);
+	  				shares.push(facebookStream[5]);
+	  				comments.push(facebookStream[6]);
+
+	  				posts.push(linkedinStream[2]);
+	  				clicks.push(linkedinStream[3]);
+	  				likes.push(linkedinStream[4]);
+	  				shares.push(linkedinStream[5]);
+	  				comments.push(linkedinStream[6]);
+
+	  				for( var i = 0; i < posts.length; i++ ) {
+	  					if ( posts[i] !== 0 ) {
+	  						cRate.push( (clicks[i] / posts[i]).toFixed(2) + "%");
+	  						ampRate.push( (shares[i] / posts[i]).toFixed(2) + "%");
+	  						appRate.push( (likes[i] / posts[i]).toFixed(2) + "%");
+	  						convRate.push( (comments[i] / posts[i]).toFixed(2) + "%");	
+	  					}
+	  					else {
+	  						cRate.push("N.A");
+	  						ampRate.push("N.A");
+	  						appRate.push("N.A");
+	  						convRate.push("N.A");	
+	  					}
+
+	  				}
 
 	  				var t = "";
 
-	  				var tmpArray = ['Founder Vision', 'From The Expert', 'Product Insights', 'Announcements', 'Event', 'Best Practices'];
-	  				var tmpArray2 = ['Facebook', 'Twitter', 'LinkedIn', 'Twitter', 'LinkedIn', 'Facebook'];
-					var posts = [123, 118, 105, 97, 89, 75],
-					clicks = [80,65,59,47,35,28],
-					clickRate = [5.4,3.3,4.7,4.5,2.8,3.2],
-					shares = [50, 43, 48, 32, 27, 22],
-					ampRate = [5.4,3.3,4.7,4.5,2.8,3.2],
-					likes = [156, 146, 148, 132, 116, 109],
-					appRate = [5.4,3.3,4.7,4.5,2.8,3.2],
-					comments = [56, 46, 58, 32, 86, 77],
-					convRate = [5.4,3.3,4.7,4.5,2.8,3.2];
+	  				for ( var i = 0; i < 3; i++ ) {
 
-					for ( var i = 0; i < 6; i++ ) {
+	  					t += "<tr>";
+	  					t += "<td>" + socialMediaArray[i] + "</td>";
+	  					t += "<td>" + posts[i] + "</td>";
+	  					t += "<td>" + clicks[i] + "</td>";
+	  					t += "<td>" + cRate[i] + "</td>";
+	  					t += "<td>" + shares[i] + "</td>";
+	  					t += "<td>" + ampRate[i] + "</td>";
+	  					t += "<td>" + likes[i] + "</td>";
+	  					t += "<td>" + appRate[i] + "</td>";
+	  					t += "<td>" + comments[i] + "</td>";
+	  					t += "<td>" + convRate[i] + "</td>";
+	  					t += "</tr>";
+	  				}
 
-						t += "<tr>";
-						t += "<td>" + tmpArray[i] + "</td>";
-						t += "<td>" + tmpArray2[i] + "</td>";
-						t += "<td>" + posts[i] + "</td>";
-						t += "<td>" + clicks[i] + "</td>";
-						t += "<td>" + clickRate[i] + "%</td>";
-						t += "<td>" + shares[i] + "</td>";
-						t += "<td>" + ampRate[i] + "%</td>";
-						t += "<td>" + likes[i] + "</td>";
-						t += "<td>" + appRate[i] + "%</td>";
-						t += "<td>" + comments[i] + "</td>";
-						t += "<td>" + convRate[i] + "%</td>";
-						t += "</tr>";
-					}
+	  				$('#socialNetworkTable > tbody').append(t);
 
-					$('#campaignTable > tbody').append(t);
 	  			}
 
-	  			function constructSocialNetworkTable () {
+	  			function constructContentTable ( date, businessId ) {
 
 	  				var inputDate = parseDate( "input", date );
 
-	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetPostStream?businessId=" + businessId + "&";
 	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
 
 	  				$.ajax({
@@ -577,72 +666,12 @@
   							else {
 	  							//return status = false
 	  							console.log(url);
-	  							console.log("GetDailyStream API failture, return status false");
+	  							console.log("GetPostStream API failture, return status false");
 	  						}
 	  					},
 	  					error 	: function () {
  	  						//server error
- 	  						console.log("GetDailyStream API failure, server error");
- 	  					}
- 	  				});
-
-
-	  				var t = "";
-
-	  				var tmpArray = ['Twitter', 'LinkedIn', 'Facebook', 'Google+'];
-					var posts = [123, 97, 89, 75],
-					clicks = [80,47,35,28],
-					clickRate = [5.4,4.5,2.8,3.2],
-					shares = [50, 32, 27, 22],
-					ampRate = [5.4,4.5,2.8,3.2],
-					likes = [156, 132, 116, 109],
-					appRate = [5.4,4.5,2.8,3.2],
-					comments = [56, 46, 86, 77],
-					convRate = [5.4,3.3,2.8,3.2];
-
-					for ( var i = 0; i < 4; i++ ) {
-
-						t += "<tr>";
-						t += "<td>" + tmpArray[i] + "</td>";
-						t += "<td>" + posts[i] + "</td>";
-						t += "<td>" + clicks[i] + "</td>";
-						t += "<td>" + clickRate[i] + "%</td>";
-						t += "<td>" + shares[i] + "</td>";
-						t += "<td>" + ampRate[i] + "%</td>";
-						t += "<td>" + likes[i] + "</td>";
-						t += "<td>" + appRate[i] + "%</td>";
-						t += "<td>" + comments[i] + "</td>";
-						t += "<td>" + convRate[i] + "%</td>";
-						t += "</tr>";
-					}
-
-					$('#socialNetworkTable > tbody').append(t);
-	  			}
-
-	  			function constructContentTable () {
-
-	  				var inputDate = parseDate( "input", date );
-
-	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
-	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
-
-	  				$.ajax({
-	  					url 	: url, 
-	  					type 	: "GET",
-	  					success : function ( response ) {
-	  						if ( response.status ) {
-	  							
-
-  							}
-  							else {
-	  							//return status = false
-	  							console.log(url);
-	  							console.log("GetDailyStream API failture, return status false");
-	  						}
-	  					},
-	  					error 	: function () {
- 	  						//server error
- 	  						console.log("GetDailyStream API failure, server error");
+ 	  						console.log("GetPostStream API failure, server error");
  	  					}
  	  				});
 
@@ -683,11 +712,11 @@
 					$('#contentTable > tbody').append(t);
 	  			}
 
-	  			function constructUserTable () {
+	  			function constructUserTable ( date, businessId ) {
 
 	  				var inputDate = parseDate( "input", date );
 
-	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetUserStream?businessId=" + businessId + "&";
 	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
 
 	  				$.ajax({
@@ -696,50 +725,73 @@
 	  					success : function ( response ) {
 	  						if ( response.status ) {
 	  							
+	  							var stream, userArray = [],
+	  								posts = [], clicks = [], likes = [], shares = [], comments = [],
+	  								cRate = [], ampRate = [], appRate = [], convRate = [];
+
+	  							stream = response.data.stream;
+
+  								for ( var i = 1; i < stream.length; i++ ) {
+
+  									userArray.push(stream[i][1]);
+  									posts.push(stream[i][2]);
+  									clicks.push(stream[i][3]);
+  									likes.push(stream[i][4]);
+  									shares.push(stream[i][5]);
+  									comments.push(stream[i][6]);
+
+  								}
+
+  								for( var i = 0; i < posts.length; i++ ) {
+  									
+  									if ( posts[i] !== 0 ) {
+  										cRate.push( (clicks[i] / posts[i]).toFixed(2) + "%");
+  										ampRate.push( (shares[i] / posts[i]).toFixed(2) + "%");
+  										appRate.push( (likes[i] / posts[i]).toFixed(2) + "%");
+  										convRate.push( (comments[i] / posts[i]).toFixed(2) + "%");	
+  									}
+  									else {
+  										cRate.push("N.A");
+  										ampRate.push("N.A");
+  										appRate.push("N.A");
+  										convRate.push("N.A");	
+  									}
+
+  								}
+
+  								var t = "";
+
+  								for ( var i = 0; i < 5; i++ ) {
+
+  									t += "<tr>";
+  									t += "<td>" + userArray[i] + "</td>";
+  									t += "<td>" + posts[i] + "</td>";
+  									t += "<td>" + clicks[i] + "</td>";
+  									t += "<td>" + cRate[i] + "%</td>";
+  									t += "<td>" + shares[i] + "</td>";
+  									t += "<td>" + ampRate[i] + "%</td>";
+  									t += "<td>" + likes[i] + "</td>";
+  									t += "<td>" + appRate[i] + "%</td>";
+  									t += "<td>" + comments[i] + "</td>";
+  									t += "<td>" + convRate[i] + "%</td>";
+  									t += "</tr>";
+  								}
+
+  								$('#userTable > tbody').append(t);
+
 
   							}
   							else {
 	  							//return status = false
 	  							console.log(url);
-	  							console.log("GetDailyStream API failture, return status false");
+	  							console.log("GetUserStream API failture, return status false");
 	  						}
 	  					},
 	  					error 	: function () {
  	  						//server error
- 	  						console.log("GetDailyStream API failure, server error");
+ 	  						console.log("GetUserStream API failure, server error");
  	  					}
  	  				});
-
-	  				var t = "";
-
-	  				var tmpArray = ['Scott Ollivier', 'Jeff Leroux', 'Bobby Keong' , 'Jin Zhe', 'Steve Sayman'];
-										var posts = [123, 105, 97, 89, 75],
-					clicks = [80,65,47,35,28],
-					clickRate = [5.4,4.7,4.5,2.8,3.2],
-					shares = [50, 43, 32, 27, 22],
-					ampRate = [5.4,3.3,4.5,2.8,3.2],
-					likes = [156, 146, 132, 116, 109],
-					appRate = [5.4,4.7,4.5,2.8,3.2],
-					comments = [56, 58, 32, 86, 77],
-					convRate = [5.4,3.3,4.5,2.8,3.2];
-
-					for ( var i = 0; i < 5; i++ ) {
-
-						t += "<tr>";
-						t += "<td>" + tmpArray[i] + "</td>";
-						t += "<td>" + posts[i] + "</td>";
-						t += "<td>" + clicks[i] + "</td>";
-						t += "<td>" + clickRate[i] + "%</td>";
-						t += "<td>" + shares[i] + "</td>";
-						t += "<td>" + ampRate[i] + "%</td>";
-						t += "<td>" + likes[i] + "</td>";
-						t += "<td>" + appRate[i] + "%</td>";
-						t += "<td>" + comments[i] + "</td>";
-						t += "<td>" + convRate[i] + "%</td>";
-						t += "</tr>";
-					}
-
-					$('#userTable > tbody').append(t);
 				}
 
 	  		});
