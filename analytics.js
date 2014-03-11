@@ -38,6 +38,10 @@ app.get('/analytics/v4', function(req, res){
   res.render('v4.html',{});
 });
 
+app.get('/analytics/v5', function(req, res){
+  res.render('v5.html',{});
+});
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
