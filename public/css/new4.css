@@ -2,16 +2,28 @@
 
 .header-section {
 	background-color: #d6d6d6;
-	height: 60px;
+	/*height: 60px;*/
 	padding: 20px;
 }
 
-.select-label {
+
+.select-date-container {
+	height: 50px;
+}
+
+.select-date-column {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.datepicker-label {
 	font-weight: bold;
+	font-size: 16px;
 }
 
 .datepicker {
 	width: 90px;
+	margin: 0px !important;
 }
 
 .ui-datepicker {
@@ -246,6 +258,19 @@
 	display: block;
 }
 
+.linechart {
+	width: 1240px;
+	height: 300px;
+	display: inline-block;
+	margin-bottom: 64px;
+
+}
+
+.columnchart {
+	width: 1240px;
+	height: 150px;
+	display: inline-block;
+}
 
 .shadow-out {
 /*  -moz-box-shadow:    3px 3px 5px 6px #ccc;
@@ -304,3 +329,12 @@
 	height: 300px; 
 	margin: 0 auto;
 }
+
+/** { outline: 2px dotted red }
+* * { outline: 2px dotted green }
+* * * { outline: 2px dotted orange }
+* * * * { outline: 2px dotted blue }
+* * * * * { outline: 1px solid red }
+* * * * * * { outline: 1px solid green }
+* * * * * * * { outline: 1px solid orange }
+* * * * * * * * { outline: 1px solid blue }*/

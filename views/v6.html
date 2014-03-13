@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+
+		<title>SMC - Overview Report</title>
+
+		<link rel="stylesheet" href="css/bootstrap.css" />
+		<link rel="stylesheet" href="css/bootstrap-responsive.css" />
+		<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="css/new4.css" />
+
+		<!-- Bootstrap, jQuery and jQuery-UI -->
+		<script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+		<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/bootstrap.js"></script>
+		<script type="text/javascript" src="js/jquery.sparkline.js"></script>
+
+		<!-- High Chart JavaScript -->
+		<script src="http://code.highcharts.com/highcharts.js"></script>
+		<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+		<!-- Custom JavaScript -->
+	  	<script type="text/javascript">
+
+	  		$( function () {
+
+	  			var businessId = 1; //Default businessId = 1
+	  			init();	//Initialization
+
+
+	  			$('#businessIdInput').change( function() {
+	  				businessId = $('#businessIdInput').val();
+	  			});
+
+	  			/******************************* FUNCTIONS DECLARATION ****************************/
+	  			function init () {
+
+		  			//Initialize Datepickers
+		  			$('#from').datepicker({
+		  				// defaultDate: "+1w",
+		  				maxDate:0,
+		  				onSelect: function( selectedDate ) {
+		  					$( "#to" ).datepicker( "option", "minDate", selectedDate );
+		  					var date = getDateFromDatepicker();
+		  					fetchSummaryData( date, businessId );
+		  					fetchChartingData( date, businessId );
+		  					constructCampaignTable( date, businessId );
+		  					constructSocialNetworkTable( date, businessId );
+		  					constructContentTable( date, businessId );
+		  					constructUserTable( date, businessId );
+		  				}
+		  			});
+
+		  			$('#to').datepicker({
+		  				// defaultDate: "+1w",
+		  				maxDate:0,
+		  				onSelect: function( selectedDate ) {
+		  					$( "#from" ).datepicker( "option", "maxDate", selectedDate );
+		  					var date = getDateFromDatepicker();
+		  					fetchSummaryData( date, businessId );
+		  					fetchChartingData( date, businessId );
+		  					constructCampaignTable( date, businessId );
+		  					constructSocialNetworkTable( date, businessId );
+		  					constructContentTable( date, businessId );
+		  					constructUserTable( date, businessId );
+		  				}
+		  			});
+
+		  			//Pre-setting default date - 30 days
+					var last30Days = new Date(), currentDay = new Date();
+					var info = {
+						s : new Date(last30Days.setDate(last30Days.getDate()-30)),
+						e : currentDay
+					}
+		  			setDateForDatepicker( info );
+
+			  		//Initialize Summary Screen
+			  		fetchSummaryData( info, businessId );
+
+			  		//Initialize Charts/Graphs
+			  		fetchChartingData( info, businessId );
+
+	  				//Initialize Tables
+	  				constructCampaignTable( info, businessId );
+	  				// constructContentTable( info, businessId );
+	  				constructUserTable( info, businessId );
+
+	  			}
+
+	  			/****************************** GENERAL FUNCTIONS ********************************/
+
+	  			function setDateForDatepicker ( date ) {
+
+	  				$( "#from" ).datepicker( "setDate", date.s );
+	  				$( "#to" ).datepicker( "setDate", date.e );
+	  			
+	  			}
+
+	  			function getDateFromDatepicker () {
+
+	  				var date = {};
+	  				date = {
+	  					s : $("#from").datepicker("getDate"),
+	  					e : $("#to").datepicker("getDate")
+	  				}
+
+	  				return date;
+	  			}
+
+	  			//Change date format
+	  			function parseDate ( type, date ) {
+
+	  				switch ( type ) {
+
+	  					case "input" : //Convert input date to APIs' date format
+
+	  						var parsedDate = {};
+		  					parsedDate.s = $.datepicker.formatDate("yymmdd", date.s); //20140215, 20140216, 20140217 
+		  					parsedDate.e = $.datepicker.formatDate("yymmdd", date.e);
+		  					return parsedDate;
+
+	  					break; 
+
+	  					case "output" : //Convert output date to different form
+
+	  						var parsedDate = [];
+
+	  						for ( var i = 0; i < date.length; i++ ) {
+	  							var tmp = $.datepicker.parseDate("yymmdd",date[i]);
+	  							parsedDate[i] = $.datepicker.formatDate("@", tmp); //unix timestamp
+	  							parsedDate[i] = +parsedDate[i]; //converting number string to integer (highchart format)
+	  						}
+		  					return parsedDate;
+
+	  					break;
+	  				}
+	  			}
+
+	  			//Add commas for numbers that have more than 4 intergers
+	  			function addCommas ( nStr ) {
+
+	  				nStr += '';
+	  				x = nStr.split('.');
+	  				x1 = x[0];
+	  				x2 = x.length > 1 ? '.' + x[1] : '';
+	  				var rgx = /(\d+)(\d{3})/;
+	  				while (rgx.test(x1)) {
+	  					x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	  				}
+	  				return x1 + x2;
+	  			}
+
+	  			/************************************* SUMMARY SCREEN FUNCTIONS ****************************/
+
+	  			function fetchSummaryData ( date, businessId ) {	//Constructing activity and impact summary window
+
+					var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetBusinessOverview?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+
+	  						//pass the same data to construct Social Network Table
+	  						constructSocialNetworkTable( response );
+
+	  						if ( response.status ) {
+
+	  							var previousStream, currentStream, previousTotalStream, currentTotalStream, previousUser, currentUser,
+	  								pPosts = [], pUsers = [], pClicks = [], pClickrate = [], pInteractions = []; //Sparkline-piechart variables declaration
+
+	  							previousStream = response.data.previous.stream;
+	  							currentStream = response.data.current.stream;
+
+	  							previousTotalStream  = previousStream[1];
+	  							currentTotalStream = currentStream[1];
+
+	  							previousUser = response.data.previous.users; 
+	  							currentUser = response.data.current.users;
+
+	  							//Sparkline-piechart tooltips defination
+	  							pUsers[0] = [['Active Users'],['Inactive Users']];
+	  							pUsers[1] = [ currentUser.active, (currentUser.total - currentUser.active) ];
+
+	  							var tmp = [['Twitter'],['Facebook'],['LinkedIn']];
+	  							pPosts[0] = tmp;
+	  							pClicks[0] = tmp;
+	  							pClickrate[0] = tmp;
+	  							pInteractions[0] = tmp;
+
+	  							pPosts[1] = []; 
+	  							pClicks[1] = [], 
+	  							pClickrate[1] = [], 
+	  							pInteractions[1] = [];
+
+	  							//Constructing sparkline-piechart data input
+	  							for ( var i = 2; i < 5; i++ ) {
+
+	  								switch ( currentStream[i][0] ) {
+
+	  									case 3:
+
+	  									pPosts[1][0] = currentStream[i][2];
+	  									pClicks[1][0] = currentStream[i][3];
+	  									pInteractions[1][0] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+
+	  									//Post can't be zero. If click == 0 -> click rate == 0. 
+	  									if ( pClicks[1][0] == 0 ) pClickrate[1][0] = 0;
+	  									else if ( pPosts[1][0] == 0 ) pClickrate[1][0] = pClicks[1][0] //Clicks coming from old posts 
+	  									else pClickrate[1][0] = ( pClicks[1][0] / pPosts[1][0] );
+	  									
+	  									break;
+
+	  									case 2:
+
+		  									pPosts[1][1] = currentStream[i][2];
+		  									pClicks[1][1] = currentStream[i][3];
+		  									pInteractions[1][1] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+
+		  									if ( pClicks[1][1] == 0 ) pClickrate[1][1] = 0;
+		  									else if ( pPosts[1][1] == 0 ) pClickrate[1][1] = pClicks[1][1] //Clicks coming from old posts
+		  									else pClickrate[1][1] = ( pClicks[1][1] / pPosts[1][1] );
+	
+	  									break;
+
+
+
+	  									case 4:
+		  								
+		  									pPosts[1][2] = currentStream[i][2];
+		  									pClicks[1][2] = currentStream[i][3];
+		  									pInteractions[1][2] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+
+		  									if ( pClicks[1][2] == 0 ) pClickrate[1][2] = 0;
+		  									else if ( pPosts[1][2] == 0 ) pClickrate[1][2] = pClicks[1][2] //Clicks coming from old posts
+		  									else pClickrate[1][2] = ( pClicks[1][2] / pPosts[1][2] );
+	  									
+	  									break;
+
+	  								}
+
+	  							}
+
+	  							// console.log(pPosts, pUsers, pClicks, pClickrate, pInteractions);
+	  							constructSparklinePiechart( pPosts, pUsers, pClicks, pClickrate, pInteractions );
+	  							displaySummaryWindow( previousTotalStream, currentTotalStream, previousUser, currentUser );
+	  							
+							}
+							else {
+								//return status = false
+								console.log(url);
+								console.log("GetBusinessOverview API failture, return status false");
+							}
+	  					},
+ 	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetBusinessOverview API failure, server error");
+	  					}
+	  				});
+	  			}
+
+	  			function displaySummaryWindow ( previousTotalStream, currentTotalStream, previousUser, currentUser ) {
+
+	  				//Posts Metrics
+	  				var prevPost = previousTotalStream[2],
+	  					prevClick = previousTotalStream[3],
+	  					curPost = currentTotalStream[2],
+	  					curClick = currentTotalStream[3],
+	  					prevTotalInteraction = previousTotalStream[3] + previousTotalStream[4] + previousTotalStream[5] + previousTotalStream[6],
+	  					curTotalInteraction = currentTotalStream[3] + currentTotalStream[4] + currentTotalStream[5] + currentTotalStream[6];
+
+	  				//Users Metrics
+	  				var prevActiveUser = previousUser.active,
+	  					curActiveUser = currentUser.active;
+
+	  				if ( prevClick == 0 ) var prevClickRate = 0;
+	  				else if ( prevPost == 0 ) var prevClickRate = prevClick; //TEMPORARY, for clicks coming from old posts 
+	  				else var prevClickRate = ( prevClick / prevPost );
+
+	  				if ( curClick == 0 ) var curClickRate = 0;
+	  				else if ( curPost == 0 ) var curClickRate = curClick; //TEMPORARY, for clicks coming from old posts 
+	  				else var curClickRate = (curClick / curPost );
+
+	  				$('#postPercentage').html( getPercentageDifference( curPost, prevPost ) );
+					$('#userPercentage').html( getPercentageDifference( curActiveUser, prevActiveUser) );
+					$('#clickPercentage').html( getPercentageDifference( curClick, prevClick ) );
+					$('#clickRatePercentage').html( getPercentageDifference( curClickRate, prevClickRate ) );
+					$('#interactionPercentage').html( getPercentageDifference( curTotalInteraction, prevTotalInteraction ) );
+
+					curPost = addCommas( curPost );
+					curClick = addCommas( curClick );
+					curClickRate = addCommas( curClickRate.toFixed(2) );
+					curTotalInteraction = addCommas( curTotalInteraction );
+
+					$('#postCount').text( curPost );
+					$('#userCount').text( currentUser.active + "/" + currentUser.total);
+					$('#clickCount').text( curClick );
+					$('#clickRateCount').text( curClickRate );
+					$('#interactionCount').text( curTotalInteraction );
+
+	  			}
+
+	  			function getPercentageDifference ( current, previous ) {
+	  				var html, value;
+
+	  				// console.log(current,previous);
+
+	  				if ( current > previous ) {
+
+	  					if( previous != 0 ) {
+	  						value = ( current - previous ) / previous * 100;
+	  						value = value.toFixed(2);
+	  						html = '<span class="percentage up"><i class="fa fa-arrow-up"></i>' + value + '%</span>';
+	  					}
+	  					else html = '<span class="percentage">--</span>'; //previously data is "zero"
+
+	  				} 
+	  				else if ( previous > current ) {
+
+	  					if ( current != 0 ) {
+	  						value = ( previous - current ) / previous * 100;
+	  						value = value.toFixed(2);
+	  						html = '<span class="percentage down"><i class="fa fa-arrow-down"></i>' + value + '%</span>';
+	  					}
+	  					else html = '<span class="percentage down">100%</span>'; //current data is "zero"
+
+	  				}
+	  				else {
+	  					//previous == current -> no difference.
+	  					html = '<span class="percentage up"><i class="fa fa-arrow-up"></i>';
+	  					html += '0.00%</span>'
+	  				}
+	  				
+	  				return html;
+	  			}
+
+	  			function constructSparklinePiechart ( val1, val2, val3, val4, val5 ) {
+	  				// console.log(val1, val2, val3, val4, val5)
+
+	  				$('.piechart1').sparkline( val1[1], {
+	  					type 	: 'pie',
+	  					width 	: '50px',
+	  					height	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val1[0]
+	  					}
+	  				});
+
+	  				$('.piechart2').sparkline( val2[1], {
+	  					type 	: 'pie',
+	  					width 	: '50px',
+	  					height 	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val2[0]
+	  					}
+	  				});
+
+	  				$('.piechart3').sparkline( val3[1], {
+	  					type 	: 'pie',
+	  					width 	: '50px',
+	  					height 	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val3[0]
+	  					}
+	  				});
+
+	  				$('.piechart4').sparkline( val4[1], {
+	  					type 	: 'pie',
+	  					width 	: '50px',
+	  					height	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val4[0]
+	  					}
+	  				});
+
+	  				$('.piechart5').sparkline( val5[1], {
+	  					type 	: 'pie',
+	  					width 	: '50px',
+	  					height 	: '100%',
+	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					tooltipValueLookups: {
+	  						'slice': val5[0]
+	  					}
+	  				});
+
+	  			}
+
+	  			/************************************ CHARTING FUNCTIONS ***********************************/
+
+	  			function fetchChartingData ( date, businessId ) {	//Charting daily line chart and column chart
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetDailyStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							var dates = [], clicks = [], shares = [], likes = [], comments = [], posts = [];
+
+	  							for ( var i = 1; i < response.data.stream.length; i++ ) {
+	  								var dailyStream = response.data.stream;
+
+	  								dates.push( dailyStream[i][0] );
+	  								posts.push( dailyStream[i][1] );
+	  								clicks.push( dailyStream[i][2] );
+	  								likes.push( dailyStream[i][3] );
+	  								shares.push( dailyStream[i][4] );
+	  								comments.push( dailyStream[i][5] );
+	  							}
+	  							dates = parseDate( "output", dates );
+	  							// console.log( dates );
+
+	  							constructCombineChart( dates, posts, clicks, shares, likes,comments);
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetDailyStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetDailyStream API failure, server error");
+ 	  					}
+ 	  				});
+	  			}
+
+	  			// HighChart default color --> http://jsfiddle.net/JfVHr/1/
+	  			function constructCombineChart ( dates, posts, clicks, shares, likes, comments ) {
+	  				 $('#combinechart').highcharts({
+			            chart: {
+			            },
+			            title: {
+			                text: null
+			            },
+			            xAxis: {
+			            	type: 'datetime',
+			            	categories: dates,
+			            	labels: {
+			            		formatter: function () {
+			            			var tmp = $.datepicker.parseDate("@", this.value);
+			            			var d = $.datepicker.formatDate("dd M", tmp);
+		            				return d;
+			            		}
+			            	}			                
+			            },
+			            yAxis: {
+			            	title : {
+			            		text: null
+			            	}
+			            },
+			            tooltip: {
+			            	xDateFormat: '%A, %b %d, %Y',
+			            	shared: true
+			            },
+			            exporting: {
+			            	enabled: false
+			            },
+			            series: [{
+			                type: 'column',
+			                name: 'Posts',
+			                data: posts
+			            }, {
+			                type: 'line',
+			                name: 'Clicks',
+			                data: clicks
+			                // marker: {
+			                // 	lineWidth: 2,
+			                // 	lineColor: Highcharts.getOptions().colors[3],
+			                // 	fillColor: 'white'
+			                // }
+			            }, {
+			                type: 'line',
+			                name: 'Shares',
+			                data: shares
+			            }, {
+			                type: 'line',
+			                name: 'Likes',
+			                data: likes
+			            }, {
+			                type: 'line',
+			                name: 'Comments',
+			                data: comments
+			            }]
+			        });
+	  			}
+
+	  			/************************************* TABLES FUNCTIONS *************************************/
+
+	  			function constructCampaignTable ( date, businessId ) {
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							var stream, campaignArray = [], destination = [],
+	  								posts = [], clicks = [], likes = [], shares = [], comments = [],
+	  								cRate = [], ampRate = [], appRate = [], convRate = [];
+
+	  							stream = response.data.stream;
+
+  								for ( var i = 1; i < stream.length; i++ ) {
+
+  									destination.push("N.A");
+  									campaignArray.push(stream[i][1]);
+  									posts.push(stream[i][2]);
+  									clicks.push(stream[i][3]);
+  									likes.push(stream[i][4]);
+  									shares.push(stream[i][5]);
+  									comments.push(stream[i][6]);
+
+  								}
+
+  								for( var i = 0; i < posts.length; i++ ) {
+
+  									if ( posts[i] !== 0 ) {
+  										cRate.push( (clicks[i] / posts[i]).toFixed(2));
+  										ampRate.push( (shares[i] / posts[i]).toFixed(2));
+  										appRate.push( (likes[i] / posts[i]).toFixed(2));
+  										convRate.push( (comments[i] / posts[i]).toFixed(2));	
+  									}
+  									else {
+  										cRate.push("N.A");
+  										ampRate.push("N.A");
+  										appRate.push("N.A");
+  										convRate.push("N.A");	
+  									}
+
+  								}
+
+  								var t = "";
+
+  								for ( var i = 0; i < campaignArray.length; i++ ) {
+
+  									t += "<tr>";
+  									t += "<td>" + campaignArray[i] + "</td>";
+  									t += "<td>" + destination[i] + "</td>";
+  									t += "<td>" + posts[i] + "</td>";
+  									t += "<td>" + clicks[i] + "</td>";
+  									t += "<td>" + cRate[i] + "</td>";
+  									t += "<td>" + shares[i] + "</td>";
+  									t += "<td>" + ampRate[i] + "</td>";
+  									t += "<td>" + likes[i] + "</td>";
+  									t += "<td>" + appRate[i] + "</td>";
+  									t += "<td>" + comments[i] + "</td>";
+  									t += "<td>" + convRate[i] + "</td>";
+  									t += "</tr>";
+  								}
+
+  								$('#campaignTable > tbody').append(t);
+
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetCampaignStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetCampaignStream API failure, server error");
+ 	  					}
+ 	  				});
+	  			}
+
+	  			function constructSocialNetworkTable ( response ) {
+
+	  				var currentStream, socialMediaArray = ['Twitter', 'Facebook', 'LinkedIn']
+	  				posts = [], clicks = [], likes = [], shares = [], comments = [],
+	  				cRate = [], ampRate = [], appRate = [], convRate = [];
+
+	  				facebookStream = response.data.current.stream[2];
+	  				linkedinStream = response.data.current.stream[3];
+	  				twitterStream = response.data.current.stream[4];
+
+	  				posts.push(twitterStream[2]);
+	  				clicks.push(twitterStream[3]);
+	  				likes.push(twitterStream[4]);
+	  				shares.push(twitterStream[5]);
+	  				comments.push(twitterStream[6]);
+
+	  				posts.push(facebookStream[2]);
+	  				clicks.push(facebookStream[3]);
+	  				likes.push(facebookStream[4]);
+	  				shares.push(facebookStream[5]);
+	  				comments.push(facebookStream[6]);
+
+	  				posts.push(linkedinStream[2]);
+	  				clicks.push(linkedinStream[3]);
+	  				likes.push(linkedinStream[4]);
+	  				shares.push(linkedinStream[5]);
+	  				comments.push(linkedinStream[6]);
+
+	  				for( var i = 0; i < posts.length; i++ ) {
+	  					if ( posts[i] !== 0 ) {
+	  						cRate.push( (clicks[i] / posts[i]).toFixed(2));
+	  						ampRate.push( (shares[i] / posts[i]).toFixed(2));
+	  						appRate.push( (likes[i] / posts[i]).toFixed(2));
+	  						convRate.push( (comments[i] / posts[i]).toFixed(2));	
+	  					}
+	  					else {
+	  						cRate.push("N.A");
+	  						ampRate.push("N.A");
+	  						appRate.push("N.A");
+	  						convRate.push("N.A");	
+	  					}
+
+	  				}
+
+	  				var t = "";
+
+	  				for ( var i = 0; i < 3; i++ ) {
+
+	  					t += "<tr>";
+	  					t += "<td>" + socialMediaArray[i] + "</td>";
+	  					t += "<td>" + posts[i] + "</td>";
+	  					t += "<td>" + clicks[i] + "</td>";
+	  					t += "<td>" + cRate[i] + "</td>";
+	  					t += "<td>" + shares[i] + "</td>";
+	  					t += "<td>" + ampRate[i] + "</td>";
+	  					t += "<td>" + likes[i] + "</td>";
+	  					t += "<td>" + appRate[i] + "</td>";
+	  					t += "<td>" + comments[i] + "</td>";
+	  					t += "<td>" + convRate[i] + "</td>";
+	  					t += "</tr>";
+	  				}
+
+	  				$('#socialNetworkTable > tbody').append(t);
+
+	  			}
+
+	  			function constructContentTable ( date, businessId ) {
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetPostStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							
+
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetPostStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetPostStream API failure, server error");
+ 	  					}
+ 	  				});
+
+	  				var t = "";
+
+	  				var tmpArray = [
+	  					"[Infographic] The Best Apps For B2B And B2C Social Media Marketing",
+	  					"Social Business Requires Social Employees",
+	  					"A List of 22 Social Media Management Tools",
+	  					"The Power of Content Marketing to Optimize Your Audience",
+	  					"Is This The Social Media Marketing Tipping Point?"
+	  				];
+					var posts = [123, 105, 97, 89, 75],
+					clicks = [80,65,47,35,28],
+					clickRate = [5.4,4.7,4.5,2.8,3.2],
+					shares = [50, 43, 32, 27, 22],
+					ampRate = [5.4,3.3,4.5,2.8,3.2],
+					likes = [156, 146, 132, 116, 109],
+					appRate = [5.4,4.7,4.5,2.8,3.2],
+					comments = [56, 58, 32, 86, 77],
+					convRate = [5.4,3.3,4.5,2.8,3.2];
+
+					for ( var i = 0; i < 5; i++ ) {
+
+						t += "<tr>";
+						t += "<td>" + tmpArray[i] + "</td>";
+						t += "<td>" + posts[i] + "</td>";
+						t += "<td>" + clicks[i] + "</td>";
+						t += "<td>" + clickRate[i] + "</td>";
+						t += "<td>" + shares[i] + "</td>";
+						t += "<td>" + ampRate[i] + "</td>";
+						t += "<td>" + likes[i] + "</td>";
+						t += "<td>" + appRate[i] + "</td>";
+						t += "<td>" + comments[i] + "</td>";
+						t += "<td>" + convRate[i] + "</td>";
+						t += "</tr>";
+					}
+					$('#contentTable > tbody').append(t);
+	  			}
+
+	  			function constructUserTable ( date, businessId ) {
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetUserStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							
+	  							var stream, userArray = [],
+	  								posts = [], clicks = [], likes = [], shares = [], comments = [],
+	  								cRate = [], ampRate = [], appRate = [], convRate = [];
+
+	  							stream = response.data.stream;
+
+  								for ( var i = 1; i < stream.length; i++ ) {
+
+  									userArray.push(stream[i][1]);
+  									posts.push(stream[i][2]);
+  									clicks.push(stream[i][3]);
+  									likes.push(stream[i][4]);
+  									shares.push(stream[i][5]);
+  									comments.push(stream[i][6]);
+
+  								}
+
+  								for( var i = 0; i < posts.length; i++ ) {
+  									
+  									if ( posts[i] !== 0 ) {
+  										cRate.push( (clicks[i] / posts[i]).toFixed(2));
+  										ampRate.push( (shares[i] / posts[i]).toFixed(2));
+  										appRate.push( (likes[i] / posts[i]).toFixed(2));
+  										convRate.push( (comments[i] / posts[i]).toFixed(2));	
+  									}
+  									else {
+  										cRate.push("N.A");
+  										ampRate.push("N.A");
+  										appRate.push("N.A");
+  										convRate.push("N.A");	
+  									}
+
+  								}
+
+  								var t = "";
+
+  								for ( var i = 0; i < 5; i++ ) {
+
+  									t += "<tr>";
+  									t += "<td>" + userArray[i] + "</td>";
+  									t += "<td>" + posts[i] + "</td>";
+  									t += "<td>" + clicks[i] + "</td>";
+  									t += "<td>" + cRate[i] + "</td>";
+  									t += "<td>" + shares[i] + "</td>";
+  									t += "<td>" + ampRate[i] + "</td>";
+  									t += "<td>" + likes[i] + "</td>";
+  									t += "<td>" + appRate[i] + "</td>";
+  									t += "<td>" + comments[i] + "</td>";
+  									t += "<td>" + convRate[i] + "</td>";
+  									t += "</tr>";
+  								}
+
+  								$('#userTable > tbody').append(t);
+
+
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetUserStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetUserStream API failure, server error");
+ 	  					}
+ 	  				});
+				}
+
+	  		});
+
+	  	</script>
+
+	</head>
+	
+	<body>
+
+		<section class="header-section">
+				
+			<div class="select-date-container">
+				
+				<div class="select-date-column">
+					<span class="datepicker-label">Performance Overview: </span>
+				</div>
+
+				<div class="select-date-column">
+					<input id="from" type="text" class="datepicker">
+				</div>
+
+				<div class="select-date-column">
+					<span class="datepicker-label"> to </span>
+				</div>
+
+				<div class="select-date-column">
+					<input id="to" type="text" class="datepicker">
+				</div>
+
+			</div>	
+
+		</section>
+
+		<section class="summary-section">
+
+			<div class="summary-container">
+
+				<div class="summary-table-container divider-btm">
+					
+					<table class="summary-table">
+						
+						<tbody>
+							<tr>
+								<td class="summary-col divider divider-left">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Posts:</div>
+													<div class="summary-col-left-btm">
+														<div id="postCount"class="metric-display"></div>
+														<div id="postPercentage" class="percentage-display"></div>
+													</div>
+
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="postPiechart" class="piechart1">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
+								</td>
+
+								<td class="summary-col divider">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Active Users:</div>
+													<div class="summary-col-left-btm">
+														<div id="userCount" class="metric-display"></div>
+														<div id="userPercentage" class="percentage-display"></div>
+													</div>
+
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="userPiechart" class="piechart2">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
+								</td>
+
+								<td class="summary-col divider">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Clicks:</div>
+													<div class="summary-col-left-btm">
+														<div id="clickCount" class="metric-display"></div>
+														<div id="clickPercentage" class="percentage-display"></div>
+													</div>
+
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="clickPiechart" class="piechart3">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
+								</td>
+
+								<td class="summary-col divider">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Click Rate:</div>
+													<div class="summary-col-left-btm">
+														<div id="clickRateCount" class="metric-display"></div>
+														<div id="clickRatePercentage" class="percentage-display"></div>
+													</div>
+
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="clickRatePiechart" class="piechart4">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
+								</td>
+
+								<td class="summary-col divider">
+									
+									<table class="panel-table">
+										<tbody>
+											<tr>
+												<td class="col-left">
+													
+													<div class="summary-col-left-top">Interactions:</div>
+													<div class="summary-col-left-btm">
+														<div id="interactionCount" class="metric-display"></div>
+														<div id="interactionPercentage" class="percentage-display"></div>
+													</div>
+
+												</td>
+												<td class="col-right">
+													
+													<div class="summary-col-right">
+														<div class="sparkline-piechart piechart-position">
+															<span id="interactionPiechart" class="piechart5">Loading...</span>
+														</div>
+													</div>
+
+												</td>
+											</tr>
+										</tbody>
+									</table>									
+									
+								</td>
+
+							</tr>
+						</tbody>
+
+					</table>
+
+				</div>
+				
+			</div>
+
+		</section>
+
+		<section class="chart-section">
+			
+			<div class="charts-container">
+
+				<div class="btn-group mode-btn">
+					<button type="button" class="btn btn-default">Day</button>
+					<button id="testing" type="button" class="btn btn-default">Week</button>
+					<button type="button" class="btn btn-default">Month</button>
+				</div>
+				
+				<div id="combinechart" class="combinechart"></div>
+
+			</div>
+
+		</section>
+		
+		<section class="table-section">
+
+			<div class="table-container">
+				
+				<div class="tabbable"> <!-- Only required for left/right tabs -->
+					
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="#tab1" data-toggle="tab">Campaigns</a></li>
+						<li><a href="#tab2" data-toggle="tab">Social Networks</a></li>
+						<li><a href="#tab3" data-toggle="tab">Top Content</a></li>
+						<li><a href="#tab4" data-toggle="tab">Top Users</a></li>
+					</ul>
+
+					<div class="tab-content">
+
+						<div class="tab-pane active" id="tab1">
+
+							<div class="campaign-table-container">
+
+								<table id="campaignTable" class="table table-hover table-bordered">
+									<thead>
+										<h4 class="inline">Campaign Performance Summary</h4>
+
+										<div class="social-network-select-container">
+											<span> Social Network:</span>
+
+											<select id="businessSelector">
+												<option value="1">All</option>
+												<option value="2">Facebook</option>
+												<option value="3">Twitter</option>
+												<option value="4">LinkedIn</option>
+											</select>
+
+										</div>
+									</thead>
+									<tbody class="campaign-table-body table-table-body">
+										<tr>
+											<th>Campaign</th>
+											<th class="m-width">Destination</th>
+											<th class="m-width">Posts</th>
+											<th class="m-width">Clicks</th>
+											<th class="m-width">Click Rate</th>
+											<th class="m-width">Shares/ Retweets</th>
+											<th class="m-width">Amplification Rate</th>
+											<th class="m-width">Likes/ Favorites</th>
+											<th class="m-width">Applause Rate</th>
+											<th class="m-width">Comments</th>
+											<th class="m-width">Conversation Rate</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+						
+						<div class="tab-pane" id="tab2">
+
+							<div class="social-network-table-container">
+
+								<table id="socialNetworkTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Social Network Performance Summary</h4>
+									</thead>
+									<tbody class="social-network-table-body table-table-body">
+										<tr>
+											<th>Social Network</th>
+											<th class="m-width">Posts</th>
+											<th class="m-width">Clicks</th>
+											<th class="m-width">Click Rate</th>
+											<th class="m-width">Shares/Retweets</th>
+											<th class="m-width">Amplification Rate</th>
+											<th class="m-width">Likes/Favorites</th>
+											<th class="m-width">Applause Rate</th>
+											<th class="m-width">Comments</th>
+											<th class="m-width">Conversation Rate</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+
+						<div class="tab-pane" id="tab3">
+
+							<div class="content-table-container">
+
+								<table id="contentTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Top Content Summary</h4>
+									</thead>
+									<tbody class="top-content-table-body table-table-body">
+										<tr>
+											<th>Title</th>
+											<th class="m-width">Posts</th>
+											<th class="m-width">Clicks</th>
+											<th class="m-width">Click Rate</th>
+											<th class="m-width">Shares/Retweets</th>
+											<th class="m-width">Amplification Rate</th>
+											<th class="m-width">Likes/Favorites</th>
+											<th class="m-width">Applause Rate</th>
+											<th class="m-width">Comments</th>
+											<th class="m-width">Conversation Rate</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+
+						<div class="tab-pane" id="tab4">
+
+							<div class="user-table-container">
+
+								<table id="userTable" class="table table-hover table-bordered">
+									<thead>
+										<h4>Top Users Summary</h4>
+									</thead>
+									<tbody class="top-user-table-body table-table-body">
+										<tr>
+											<th>User</th>
+											<th class="m-width">Posts</th>
+											<th class="m-width">Clicks</th>
+											<th class="m-width">Click Rate</th>
+											<th class="m-width">Shares/Retweets</th>
+											<th class="m-width">Amplification Rate</th>
+											<th class="m-width">Likes/Favorites</th>
+											<th class="m-width">Applause Rate</th>
+											<th class="m-width">Comments</th>
+											<th class="m-width">Conversation Rate</th>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+						
+						</div>
+					
+					</div>
+				
+				</div>
+
+			</div>
+
+		</section>
+
+	</body>
+
+</html>
