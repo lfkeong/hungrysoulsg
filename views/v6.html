@@ -26,13 +26,35 @@
 
 	  		$( function () {
 
-	  			var businessId = 1; //Default businessId = 1
+	  			
 	  			init();	//Initialization
 
+	  			$('.btn').click( function () {
+	  				$('.btn').removeClass('btn-active');
+	  				$(this).addClass('btn-active');
 
-	  			$('#businessIdInput').change( function() {
-	  				businessId = $('#businessIdInput').val();
-	  			});
+	  				switch( $(this).attr('id') ) {
+	  					case 'dayBtn' :
+	  					
+	  					console.log();
+						//daily aggregation
+
+						break;
+						case 'weekBtn' :
+
+						console.log();
+						//weekly aggregation
+
+						break;
+						case 'monthBtn' :
+
+						console.log();
+						//monthly aggregation
+
+						break;
+					}
+
+				});	
 
 	  			/******************************* FUNCTIONS DECLARATION ****************************/
 	  			function init () {
@@ -84,7 +106,7 @@
 
 	  				//Initialize Tables
 	  				constructCampaignTable( info, businessId );
-	  				// constructContentTable( info, businessId );
+	  				constructContentTable( info, businessId );
 	  				constructUserTable( info, businessId );
 
 	  			}
@@ -660,7 +682,61 @@
 	  					type 	: "GET",
 	  					success : function ( response ) {
 	  						if ( response.status ) {
-	  							
+	  							var stream, postArray = [],
+	  								clicks = [], likes = [], shares = [], comments = [],
+	  								cRate = [], ampRate = [], appRate = [], convRate = [];
+
+	  							stream = response.data.stream;
+
+  								for ( var i = 1; i < stream.length; i++ ) {
+
+  									postArray.push(stream[i][1]);
+  									clicks.push(stream[i][3]);
+  									likes.push(stream[i][4]);
+  									shares.push(stream[i][5]);
+  									comments.push(stream[i][6]);
+
+  								}
+
+  								for( var i = 0; i < postArray.length; i++ ) {
+
+  									// if ( posts[i] !== 0 ) {
+  										cRate.push("N.A");
+  										ampRate.push("N.A");
+  										appRate.push("N.A");
+  										convRate.push("N.A");	
+  										// cRate.push( (clicks[i] / posts[i]).toFixed(2));
+  										// ampRate.push( (shares[i] / posts[i]).toFixed(2));
+  										// appRate.push( (likes[i] / posts[i]).toFixed(2));
+  										// convRate.push( (comments[i] / posts[i]).toFixed(2));	
+  									// }
+  									// else {
+  									// 	cRate.push("N.A");
+  									// 	ampRate.push("N.A");
+  									// 	appRate.push("N.A");
+  									// 	convRate.push("N.A");	
+  									// }
+
+  								}
+
+  								var t = "";
+
+  								for ( var i = 0; i < postArray.length; i++ ) {
+
+  									t += "<tr>";
+  									t += "<td>" + postArray[i] + "</td>";
+  									// t += "<td>" + posts[i] + "</td>";
+  									t += "<td>" + clicks[i] + "</td>";
+  									t += "<td>" + cRate[i] + "</td>";
+  									t += "<td>" + shares[i] + "</td>";
+  									t += "<td>" + ampRate[i] + "</td>";
+  									t += "<td>" + likes[i] + "</td>";
+  									t += "<td>" + appRate[i] + "</td>";
+  									t += "<td>" + comments[i] + "</td>";
+  									t += "<td>" + convRate[i] + "</td>";
+  									t += "</tr>";
+  								}
+  								$('#contentTable > tbody').append(t);
 
   							}
   							else {
@@ -674,42 +750,6 @@
  	  						console.log("GetPostStream API failure, server error");
  	  					}
  	  				});
-
-	  				var t = "";
-
-	  				var tmpArray = [
-	  					"[Infographic] The Best Apps For B2B And B2C Social Media Marketing",
-	  					"Social Business Requires Social Employees",
-	  					"A List of 22 Social Media Management Tools",
-	  					"The Power of Content Marketing to Optimize Your Audience",
-	  					"Is This The Social Media Marketing Tipping Point?"
-	  				];
-					var posts = [123, 105, 97, 89, 75],
-					clicks = [80,65,47,35,28],
-					clickRate = [5.4,4.7,4.5,2.8,3.2],
-					shares = [50, 43, 32, 27, 22],
-					ampRate = [5.4,3.3,4.5,2.8,3.2],
-					likes = [156, 146, 132, 116, 109],
-					appRate = [5.4,4.7,4.5,2.8,3.2],
-					comments = [56, 58, 32, 86, 77],
-					convRate = [5.4,3.3,4.5,2.8,3.2];
-
-					for ( var i = 0; i < 5; i++ ) {
-
-						t += "<tr>";
-						t += "<td>" + tmpArray[i] + "</td>";
-						t += "<td>" + posts[i] + "</td>";
-						t += "<td>" + clicks[i] + "</td>";
-						t += "<td>" + clickRate[i] + "</td>";
-						t += "<td>" + shares[i] + "</td>";
-						t += "<td>" + ampRate[i] + "</td>";
-						t += "<td>" + likes[i] + "</td>";
-						t += "<td>" + appRate[i] + "</td>";
-						t += "<td>" + comments[i] + "</td>";
-						t += "<td>" + convRate[i] + "</td>";
-						t += "</tr>";
-					}
-					$('#contentTable > tbody').append(t);
 	  			}
 
 	  			function constructUserTable ( date, businessId ) {
@@ -997,8 +1037,8 @@
 			<div class="charts-container">
 
 				<div class="btn-group mode-btn">
-					<button type="button" class="btn btn-default">Day</button>
-					<button id="testing" type="button" class="btn btn-default">Week</button>
+					<button type="button" class="btn btn-default btn-active">Day</button>
+					<button type="button" class="btn btn-default">Week</button>
 					<button type="button" class="btn btn-default">Month</button>
 				</div>
 				
@@ -1103,7 +1143,6 @@
 									<tbody class="top-content-table-body table-table-body">
 										<tr>
 											<th>Title</th>
-											<th class="m-width">Posts</th>
 											<th class="m-width">Clicks</th>
 											<th class="m-width">Click Rate</th>
 											<th class="m-width">Shares/Retweets</th>
