@@ -26,35 +26,73 @@
 
 	  		$( function () {
 
+	  			var businessId = 1; //temporary fix
 	  			
-	  			init();	//Initialization
+	  			//Tooltips Variables
+	  			var ttPosts 		= "Number of posts to social touchpoints",
+	  				ttUsers 		= "Number of users that have posted content during the specified timeframe",
+	  				ttClicks 		= "Number of clicks on the posted content",
+	  				ttClickRate 	= "Number of clicks per post",
+	  				ttInteractions 	= "Total number of interactions, including clicks, shares/retweets, favorites/likes, and comments",
 
-	  			$('.btn').click( function () {
-	  				$('.btn').removeClass('btn-active');
-	  				$(this).addClass('btn-active');
+		  			ttDestination 	= "Social network touchpoint (timeline, page, group)",
+		  			ttSocialNetwork	= "Social network (Twitter, LinkedIn, Facebook)",
+		  			ttTitle			= "Title of content posted",
+		  			
+		  			ttShares		= "Number of shares on Facebook and LinkedIn and Retweets on Twitter",
+		  			ttAmpRate  		= "Number of shares/retweets per post.",
+		  			ttLikes			= "Number of likes on Facebook and LinkedIn and favorites on Twitter",
+		  			ttAppRate  		= "Number of likes/favorites per post",
+		  			ttComments  	= "Number of comments on Facebook and LinkedIn",
+		  			ttConvRate  	= "Number of comments per post.";
 
+		  		init();	//Initialization
+
+
+				$(".btn-custom").click( function () {
+					$('.btn-custom').removeClass('active');
+	  				$(this).addClass('active');
 	  				switch( $(this).attr('id') ) {
 	  					case 'dayBtn' :
-	  					
-	  					console.log();
+
+	  					console.log("call day");
 						//daily aggregation
 
 						break;
 						case 'weekBtn' :
 
-						console.log();
+						console.log("call week");
 						//weekly aggregation
 
 						break;
 						case 'monthBtn' :
 
-						console.log();
+						console.log("call month");
 						//monthly aggregation
 
 						break;
 					}
+				});
 
-				});	
+				$(".table-tab").click( function () {
+					$(".table-tab").removeClass('active');
+					$(this).addClass('active');
+
+					$('.table-container').children().hide();
+
+					switch ( $(this).attr('id') ) {
+
+						case "campaignTableTab" : $('#campaignTableContainer').show();
+						break;
+						case "socialNetworkTableTab" : $('#socialNetworkTableContainer').show();
+						break;
+						case "contentTableTab" : $('#contentTableContainer').show();
+						break;
+						case "userTableTab" : $('#userTableContainer').show();
+						break;
+					}
+				});
+
 
 	  			/******************************* FUNCTIONS DECLARATION ****************************/
 	  			function init () {
@@ -69,7 +107,6 @@
 		  					fetchSummaryData( date, businessId );
 		  					fetchChartingData( date, businessId );
 		  					constructCampaignTable( date, businessId );
-		  					constructSocialNetworkTable( date, businessId );
 		  					constructContentTable( date, businessId );
 		  					constructUserTable( date, businessId );
 		  				}
@@ -84,7 +121,6 @@
 		  					fetchSummaryData( date, businessId );
 		  					fetchChartingData( date, businessId );
 		  					constructCampaignTable( date, businessId );
-		  					constructSocialNetworkTable( date, businessId );
 		  					constructContentTable( date, businessId );
 		  					constructUserTable( date, businessId );
 		  				}
@@ -102,12 +138,19 @@
 			  		fetchSummaryData( info, businessId );
 
 			  		//Initialize Charts/Graphs
+			  		$("#summaryTab").addClass('active');
+			  		$("#chartTab").addClass('active');
+			  		$("#dayBtn").addClass('active');
+			  		$('#campaignTableTab').addClass('active');
 			  		fetchChartingData( info, businessId );
 
 	  				//Initialize Tables
 	  				constructCampaignTable( info, businessId );
 	  				constructContentTable( info, businessId );
 	  				constructUserTable( info, businessId );
+
+	  				//Initialize Tooltips
+	  				initiateTooltips();
 
 	  			}
 
@@ -337,7 +380,7 @@
 	  					if( previous != 0 ) {
 	  						value = ( current - previous ) / previous * 100;
 	  						value = value.toFixed(2);
-	  						html = '<span class="percentage up"><i class="fa fa-arrow-up"></i>' + value + '%</span>';
+	  						html = '<span class="percentage up"><i class="fa fa-arrow-up">' + value + '%</i></span>';
 	  					}
 	  					else html = '<span class="percentage">--</span>'; //previously data is "zero"
 
@@ -347,15 +390,14 @@
 	  					if ( current != 0 ) {
 	  						value = ( previous - current ) / previous * 100;
 	  						value = value.toFixed(2);
-	  						html = '<span class="percentage down"><i class="fa fa-arrow-down"></i>' + value + '%</span>';
+	  						html = '<span class="percentage down"><i class="fa fa-arrow-down">' + value + '%</i></span>';
 	  					}
-	  					else html = '<span class="percentage down">100%</span>'; //current data is "zero"
+	  					else html = '<span class="percentage down"><i class="fa fa-arrow-down">100%</i></span>'; //current data is "zero"
 
 	  				}
 	  				else {
 	  					//previous == current -> no difference.
-	  					html = '<span class="percentage up"><i class="fa fa-arrow-up"></i>';
-	  					html += '0.00%</span>'
+	  					html = '<span class="percentage up">--</span>';
 	  				}
 	  				
 	  				return html;
@@ -573,7 +615,7 @@
 
   								for ( var i = 0; i < campaignArray.length; i++ ) {
 
-  									t += "<tr>";
+  									t += "<tr class='campaign-table-row-body'>";
   									t += "<td>" + campaignArray[i] + "</td>";
   									t += "<td>" + destination[i] + "</td>";
   									t += "<td>" + posts[i] + "</td>";
@@ -588,6 +630,7 @@
   									t += "</tr>";
   								}
 
+  								$('.campaign-table-row-body').remove();
   								$('#campaignTable > tbody').append(t);
 
   							}
@@ -652,7 +695,7 @@
 
 	  				for ( var i = 0; i < 3; i++ ) {
 
-	  					t += "<tr>";
+	  					t += "<tr class='social-network-table-row-body'>";
 	  					t += "<td>" + socialMediaArray[i] + "</td>";
 	  					t += "<td>" + posts[i] + "</td>";
 	  					t += "<td>" + clicks[i] + "</td>";
@@ -666,6 +709,7 @@
 	  					t += "</tr>";
 	  				}
 
+	  				$('.social-network-table-row-body').remove();
 	  				$('#socialNetworkTable > tbody').append(t);
 
 	  			}
@@ -723,7 +767,7 @@
 
   								for ( var i = 0; i < postArray.length; i++ ) {
 
-  									t += "<tr>";
+  									t += "<tr class='content-table-row-body'>";
   									t += "<td>" + postArray[i] + "</td>";
   									// t += "<td>" + posts[i] + "</td>";
   									t += "<td>" + clicks[i] + "</td>";
@@ -736,6 +780,8 @@
   									t += "<td>" + convRate[i] + "</td>";
   									t += "</tr>";
   								}
+
+  								$('.content-table-row-body').remove();
   								$('#contentTable > tbody').append(t);
 
   							}
@@ -803,7 +849,7 @@
 
   								for ( var i = 0; i < 5; i++ ) {
 
-  									t += "<tr>";
+  									t += "<tr class='user-table-row-body'>";
   									t += "<td>" + userArray[i] + "</td>";
   									t += "<td>" + posts[i] + "</td>";
   									t += "<td>" + clicks[i] + "</td>";
@@ -814,11 +860,11 @@
   									t += "<td>" + appRate[i] + "</td>";
   									t += "<td>" + comments[i] + "</td>";
   									t += "<td>" + convRate[i] + "</td>";
-  									t += "</tr>";
+  									t += "</tr>"
   								}
 
+  								$('.user-table-row-body').remove();
   								$('#userTable > tbody').append(t);
-
 
   							}
   							else {
@@ -834,6 +880,55 @@
  	  				});
 				}
 
+				function initiateTooltips () {
+					console.log("inside", ttPosts, ttClicks);
+					var tooltipOptions = {
+						"show"		: true,
+						"placement"	: "top", 
+						"trigger"	: "hover",
+						"delay"		: { show: 500, hide: 100 },
+						"container" : "body"
+					}
+
+					var dom = document.querySelectorAll('[data-tt]');
+
+					for ( var i = 0; i < dom.length; i++ ) {
+
+						switch ( dom[i].getAttribute("data-tt") ) {
+						case "post" : tooltipOptions.title = ttPosts;
+						break 
+						case "user" : tooltipOptions.title = ttUsers;
+						break 
+						case "click" : tooltipOptions.title = ttClicks;
+						break 
+						case "clickRate" : tooltipOptions.title = ttClickRate;
+						break 
+						case "interaction" : tooltipOptions.title = ttInteractions;
+						break 
+						case "destination" : tooltipOptions.title = ttDestination;
+						break 
+						case "socialNetwork" : tooltipOptions.title = ttSocialNetwork;
+						break 
+						case "title" : tooltipOptions.title = ttTitle;
+						break 
+						case "share" : tooltipOptions.title = ttShares;
+						break 
+						case "ampRate" : tooltipOptions.title = ttAmpRate;
+						break 
+						case "like" : tooltipOptions.title = ttLikes;
+						break 
+						case "appRate" : tooltipOptions.title = ttAppRate;
+						break 
+						case "comment" : tooltipOptions.title = ttComments;
+						break 
+						case "convRate" : tooltipOptions.title = ttConvRate;
+						break
+
+						} 
+						$(dom[i]).tooltip( tooltipOptions );
+					}
+				}
+
 	  		});
 
 	  	</script>
@@ -842,12 +937,14 @@
 	
 	<body>
 
+
+
 		<section class="header-section">
 				
-			<div class="select-date-container">
-				
+			<div class="select-date-container"> 
+
 				<div class="select-date-column">
-					<span class="datepicker-label">Performance Overview: </span>
+					<span class="datepicker-label">Performance Overview:</span>
 				</div>
 
 				<div class="select-date-column">
@@ -855,7 +952,7 @@
 				</div>
 
 				<div class="select-date-column">
-					<span class="datepicker-label"> to </span>
+					<span class="datepicker-label">to</span>
 				</div>
 
 				<div class="select-date-column">
@@ -870,6 +967,14 @@
 
 			<div class="summary-container">
 
+				<div class="tab-custom-container">
+					<ul class="tab-custom-ul">
+						<li id="summaryTab" class="summary-tab tab-custom-li">
+							Active and Impact
+						</li>
+					</ul>
+				</div>
+
 				<div class="summary-table-container divider-btm">
 					
 					<table class="summary-table">
@@ -881,7 +986,7 @@
 									<table class="panel-table">
 										<tbody>
 											<tr>
-												<td class="col-left">
+												<td class="col-left" data-tt="post">
 													
 													<div class="summary-col-left-top">Posts:</div>
 													<div class="summary-col-left-btm">
@@ -910,7 +1015,7 @@
 									<table class="panel-table">
 										<tbody>
 											<tr>
-												<td class="col-left">
+												<td class="col-left" data-tt="user">
 													
 													<div class="summary-col-left-top">Active Users:</div>
 													<div class="summary-col-left-btm">
@@ -939,7 +1044,7 @@
 									<table class="panel-table">
 										<tbody>
 											<tr>
-												<td class="col-left">
+												<td class="col-left" data-tt="click">
 													
 													<div class="summary-col-left-top">Clicks:</div>
 													<div class="summary-col-left-btm">
@@ -968,7 +1073,7 @@
 									<table class="panel-table">
 										<tbody>
 											<tr>
-												<td class="col-left">
+												<td class="col-left" data-tt="clickRate">
 													
 													<div class="summary-col-left-top">Click Rate:</div>
 													<div class="summary-col-left-btm">
@@ -997,7 +1102,7 @@
 									<table class="panel-table">
 										<tbody>
 											<tr>
-												<td class="col-left">
+												<td class="col-left" data-tt="interaction">
 													
 													<div class="summary-col-left-top">Interactions:</div>
 													<div class="summary-col-left-btm">
@@ -1033,13 +1138,21 @@
 		</section>
 
 		<section class="chart-section">
+
+			<div class="tab-custom-container">
+				<ul class="tab-custom-ul">
+					<li id="chartTab" class="chart-tab tab-custom-li">
+					Overview Trend
+					</li>
+				</ul>
+			</div>
 			
 			<div class="charts-container">
 
 				<div class="btn-group mode-btn">
-					<button type="button" class="btn btn-default btn-active">Day</button>
-					<button type="button" class="btn btn-default">Week</button>
-					<button type="button" class="btn btn-default">Month</button>
+					<button id="dayBtn" type="button" class="btn btn-default btn-custom">Day</button>
+					<button id="weekBtn" type="button" class="btn btn-default btn-custom">Week</button>
+					<button id="monthBtn" type="button" class="btn btn-default btn-custom">Month</button>
 				</div>
 				
 				<div id="combinechart" class="combinechart"></div>
@@ -1050,146 +1163,125 @@
 		
 		<section class="table-section">
 
+			<div class="tab-custom-container">
+				<ul class="tab-custom-ul">
+					<li id="campaignTableTab" class="table-tab tab-custom-li">Campaigns</li
+					><li id="socialNetworkTableTab" class="table-tab tab-custom-li">Social Networks</li
+					><li id="contentTableTab" class="table-tab tab-custom-li">Top Content</li
+					><li id="userTableTab" class="table-tab tab-custom-li">Top Users</li>
+				</ul>
+			</div>
+
 			<div class="table-container">
-				
-				<div class="tabbable"> <!-- Only required for left/right tabs -->
-					
-					<ul class="nav nav-tabs">
-						<li class="active"><a href="#tab1" data-toggle="tab">Campaigns</a></li>
-						<li><a href="#tab2" data-toggle="tab">Social Networks</a></li>
-						<li><a href="#tab3" data-toggle="tab">Top Content</a></li>
-						<li><a href="#tab4" data-toggle="tab">Top Users</a></li>
-					</ul>
 
-					<div class="tab-content">
+				<div id="campaignTableContainer" class="campaign-table-container">
 
-						<div class="tab-pane active" id="tab1">
+					<table id="campaignTable" class="table table-hover table-bordered">
+						<thead>
+							<h4 class="inline">Campaign Performance Summary</h4>
 
-							<div class="campaign-table-container">
+							<div class="social-network-select-container">
+								<span> Social Network:</span>
 
-								<table id="campaignTable" class="table table-hover table-bordered">
-									<thead>
-										<h4 class="inline">Campaign Performance Summary</h4>
-
-										<div class="social-network-select-container">
-											<span> Social Network:</span>
-
-											<select id="businessSelector">
-												<option value="1">All</option>
-												<option value="2">Facebook</option>
-												<option value="3">Twitter</option>
-												<option value="4">LinkedIn</option>
-											</select>
-
-										</div>
-									</thead>
-									<tbody class="campaign-table-body table-table-body">
-										<tr>
-											<th>Campaign</th>
-											<th class="m-width">Destination</th>
-											<th class="m-width">Posts</th>
-											<th class="m-width">Clicks</th>
-											<th class="m-width">Click Rate</th>
-											<th class="m-width">Shares/ Retweets</th>
-											<th class="m-width">Amplification Rate</th>
-											<th class="m-width">Likes/ Favorites</th>
-											<th class="m-width">Applause Rate</th>
-											<th class="m-width">Comments</th>
-											<th class="m-width">Conversation Rate</th>
-										</tr>
-									</tbody>
-								</table>
+								<select id="businessSelector">
+									<option value="1">All</option>
+									<option value="2">Facebook</option>
+									<option value="3">Twitter</option>
+									<option value="4">LinkedIn</option>
+								</select>
 
 							</div>
-						
-						</div>
-						
-						<div class="tab-pane" id="tab2">
+						</thead>
+						<tbody class="campaign-table-body table-table-body">
+							<tr>
+  								<th>Campaign</th>
+  								<th class='m-width' data-tt='destination'>Destination</th>
+  								<th class='m-width' data-tt='post'>Posts</th>
+  								<th class='m-width' data-tt='click'>Clicks</th>
+  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
+  								<th class='m-width' data-tt='share'>Shares/Retweets</th>
+  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
+  								<th class='m-width' data-tt='like'>Likes/Favorites</th>
+  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
+  								<th class='m-width' data-tt='comment'>Comments</th>
+  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
+  							</tr>
+						</tbody>
+					</table>
 
-							<div class="social-network-table-container">
-
-								<table id="socialNetworkTable" class="table table-hover table-bordered">
-									<thead>
-										<h4>Social Network Performance Summary</h4>
-									</thead>
-									<tbody class="social-network-table-body table-table-body">
-										<tr>
-											<th>Social Network</th>
-											<th class="m-width">Posts</th>
-											<th class="m-width">Clicks</th>
-											<th class="m-width">Click Rate</th>
-											<th class="m-width">Shares/Retweets</th>
-											<th class="m-width">Amplification Rate</th>
-											<th class="m-width">Likes/Favorites</th>
-											<th class="m-width">Applause Rate</th>
-											<th class="m-width">Comments</th>
-											<th class="m-width">Conversation Rate</th>
-										</tr>
-									</tbody>
-								</table>
-
-							</div>
-						
-						</div>
-
-						<div class="tab-pane" id="tab3">
-
-							<div class="content-table-container">
-
-								<table id="contentTable" class="table table-hover table-bordered">
-									<thead>
-										<h4>Top Content Summary</h4>
-									</thead>
-									<tbody class="top-content-table-body table-table-body">
-										<tr>
-											<th>Title</th>
-											<th class="m-width">Clicks</th>
-											<th class="m-width">Click Rate</th>
-											<th class="m-width">Shares/Retweets</th>
-											<th class="m-width">Amplification Rate</th>
-											<th class="m-width">Likes/Favorites</th>
-											<th class="m-width">Applause Rate</th>
-											<th class="m-width">Comments</th>
-											<th class="m-width">Conversation Rate</th>
-										</tr>
-									</tbody>
-								</table>
-
-							</div>
-						
-						</div>
-
-						<div class="tab-pane" id="tab4">
-
-							<div class="user-table-container">
-
-								<table id="userTable" class="table table-hover table-bordered">
-									<thead>
-										<h4>Top Users Summary</h4>
-									</thead>
-									<tbody class="top-user-table-body table-table-body">
-										<tr>
-											<th>User</th>
-											<th class="m-width">Posts</th>
-											<th class="m-width">Clicks</th>
-											<th class="m-width">Click Rate</th>
-											<th class="m-width">Shares/Retweets</th>
-											<th class="m-width">Amplification Rate</th>
-											<th class="m-width">Likes/Favorites</th>
-											<th class="m-width">Applause Rate</th>
-											<th class="m-width">Comments</th>
-											<th class="m-width">Conversation Rate</th>
-										</tr>
-									</tbody>
-								</table>
-
-							</div>
-						
-						</div>
-					
-					</div>
-				
 				</div>
+			
+				<div id="socialNetworkTableContainer" class="social-network-table-container hide">
+
+					<table id="socialNetworkTable" class="table table-hover table-bordered">
+						<thead>
+							<h4>Social Network Performance Summary</h4>
+						</thead>
+						<tbody class="social-network-table-body table-table-body">
+							<tr>
+				  				<th data-tt='socialNetwork'>Social Network</th>
+				  				<th class='m-width' data-tt='post'>Posts</th>
+				  				<th class='m-width' data-tt='click'>Clicks</th>
+				  				<th class='m-width' data-tt='clickRate'>Click Rate</th>
+				  				<th class='m-width' data-tt='share'>Shares/Retweets</th>
+				  				<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
+				  				<th class='m-width' data-tt='like'>Likes/Favorites</th>
+				  				<th class='m-width' data-tt='appRate'>Applause Rate</th>
+				  				<th class='m-width' data-tt='comment'>Comments</th>
+				  				<th class='m-width' data-tt='convRate'>Conversation Rate</th>
+			  				</tr>
+						</tbody>
+					</table>
+
+				</div>
+
+				<div id="contentTableContainer" class="content-table-container hide">
+
+					<table id="contentTable" class="table table-hover table-bordered">
+						<thead>
+							<h4>Top Content Summary</h4>
+						</thead>
+						<tbody class="top-content-table-body table-table-body">
+							<tr>
+  								<th data-tt='title'>Title</th>
+  								<!-- <th class='m-width' data-tt='post'>Posts</th> -->
+  								<th class='m-width' data-tt='click'>Clicks</th>
+  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
+  								<th class='m-width' data-tt='share'>Shares/Retweets</th>
+  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
+  								<th class='m-width' data-tt='like'>Likes/Favorites</th>
+  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
+  								<th class='m-width' data-tt='comment'>Comments</th>
+  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
+  							</tr>
+						</tbody>
+					</table>
+
+				</div>
+			
+				<div id="userTableContainer" class="user-table-container hide">
+
+					<table id="userTable" class="table table-hover table-bordered">
+						<thead>
+							<h4>Top Users Summary</h4>
+						</thead>
+						<tbody class="top-user-table-body table-table-body">
+  							<tr>
+  								<th>User</th>
+  								<th class='m-width' data-tt='post'>Posts</th>
+  								<th class='m-width' data-tt='click'>Clicks</th>
+  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
+  								<th class='m-width' data-tt='share'>Shares/Retweets</th>
+  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
+  								<th class='m-width' data-tt='like'>Likes/Favorites</th>
+  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
+  								<th class='m-width' data-tt='comment'>Comments</th>
+  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
+  							</tr>
+						</tbody>
+					</table>
+
+				</div>	
 
 			</div>
 

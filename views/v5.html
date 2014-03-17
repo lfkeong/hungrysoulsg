@@ -12,7 +12,8 @@
 		<link rel="stylesheet" type="text/css" href="css/new3.css" />
 
 		<!-- Bootstrap, jQuery and jQuery-UI -->
-		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+		<!-- <script src="http://code.jquery.com/jquery-1.9.1.js"></script> -->
 		<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 		<script type="text/javascript" src="js/bootstrap.js"></script>
 		<script type="text/javascript" src="js/jquery.sparkline.js"></script>
@@ -440,7 +441,7 @@
 
 	  			// HighChart default color --> http://jsfiddle.net/JfVHr/1/
 	  			function constructCombineChart ( dates, posts, clicks, shares, likes, comments ) {
-	  				 $('#container').highcharts({
+	  				 $('#combinechart').highcharts({
 			            chart: {
 			            },
 			            title: {
@@ -533,10 +534,10 @@
   								for( var i = 0; i < posts.length; i++ ) {
 
   									if ( posts[i] !== 0 ) {
-  										cRate.push( (clicks[i] / posts[i]).toFixed(2) + "%");
-  										ampRate.push( (shares[i] / posts[i]).toFixed(2) + "%");
-  										appRate.push( (likes[i] / posts[i]).toFixed(2) + "%");
-  										convRate.push( (comments[i] / posts[i]).toFixed(2) + "%");	
+  										cRate.push( (clicks[i] / posts[i]).toFixed(2));
+  										ampRate.push( (shares[i] / posts[i]).toFixed(2));
+  										appRate.push( (likes[i] / posts[i]).toFixed(2));
+  										convRate.push( (comments[i] / posts[i]).toFixed(2));	
   									}
   									else {
   										cRate.push("N.A");
@@ -612,10 +613,10 @@
 
 	  				for( var i = 0; i < posts.length; i++ ) {
 	  					if ( posts[i] !== 0 ) {
-	  						cRate.push( (clicks[i] / posts[i]).toFixed(2) + "%");
-	  						ampRate.push( (shares[i] / posts[i]).toFixed(2) + "%");
-	  						appRate.push( (likes[i] / posts[i]).toFixed(2) + "%");
-	  						convRate.push( (comments[i] / posts[i]).toFixed(2) + "%");	
+	  						cRate.push( (clicks[i] / posts[i]).toFixed(2));
+	  						ampRate.push( (shares[i] / posts[i]).toFixed(2));
+	  						appRate.push( (likes[i] / posts[i]).toFixed(2));
+	  						convRate.push( (comments[i] / posts[i]).toFixed(2));	
 	  					}
 	  					else {
 	  						cRate.push("N.A");
@@ -745,10 +746,10 @@
   								for( var i = 0; i < posts.length; i++ ) {
   									
   									if ( posts[i] !== 0 ) {
-  										cRate.push( (clicks[i] / posts[i]).toFixed(2) + "%");
-  										ampRate.push( (shares[i] / posts[i]).toFixed(2) + "%");
-  										appRate.push( (likes[i] / posts[i]).toFixed(2) + "%");
-  										convRate.push( (comments[i] / posts[i]).toFixed(2) + "%");	
+  										cRate.push( (clicks[i] / posts[i]).toFixed(2));
+  										ampRate.push( (shares[i] / posts[i]).toFixed(2));
+  										appRate.push( (likes[i] / posts[i]).toFixed(2));
+  										convRate.push( (comments[i] / posts[i]).toFixed(2));	
   									}
   									else {
   										cRate.push("N.A");
@@ -835,10 +836,6 @@
 		</section>
 
 		<section class="summary-section">
-			
-<!-- 			<div>
-				<h4>Activity and Impact Summary</h4>
-			</div> -->
 
 			<div class="summary-container">
 
@@ -1005,22 +1002,16 @@
 		</section>
 
 		<section class="chart-section">
-
-<!-- 			<div>
-				<h4>Trends</h4>
-			</div> -->
 			
 			<div class="charts-container">
 
 				<div class="btn-group mode-btn">
 					<button type="button" class="btn btn-default">Day</button>
-					<button id="testing" type="button" class="btn btn-default" onclick="toggleWeek();">Week</button>
+					<button id="testing" type="button" class="btn btn-default">Week</button>
 					<button type="button" class="btn btn-default">Month</button>
 				</div>
 				
-				<div id="container" style="width: 100%; height: 400px; margin: 0 auto"></div>
-<!-- 				<div id="linechart" class="linechart shadow-out"></div>
-				<div id="columnchart" class="columnchart shadow-out"></div> -->
+				<div id="combinechart" class="combinechart"></div>
 
 			</div>
 

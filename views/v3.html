@@ -144,7 +144,7 @@
 
 					var inputDate = parseDate( "input", date );
 
-	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetBusinessOverview?businessId=42&";
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetBusinessOverview?businessId=1&";
 	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
 
 	  				$.ajax({
@@ -155,7 +155,11 @@
 	  						if ( response.status ) {
 
 	  							var previousStream, currentStream, previousTotalStream, currentTotalStream, 
-	  								pPosts = pUsers = pClicks = pClickrate = pInteractions = [];	//Sparkline-piechart variables declaration
+	  								pPosts = [],
+	  								pUsers = [],
+	  								pClicks = [],
+	  								pClickrate = [],
+	  								pInteractions = [];	//Sparkline-piechart variables declaration
 
 	  							previousStream = response.data.previous.stream;
 	  							currentStream = response.data.current.stream;
@@ -165,58 +169,66 @@
 
 	  							//Sparkline-piechart tooltips defination
 	  							pUsers[0] = [['Active Users'],['Inactive Users']];
-	  							pUsers[1] = [ 4 , 6 ] // temporary fix - currently don't have user data yet
-	  							pPosts[0] = pClicks[0] = pClickrate[0] = pInteractions[0] = [['Twitter'],['Facebook'],['LinkedIn']];
-	  							pPosts[1] = pClicks[1] = pClickrate[1] = pInteractions[1] = []; //temporary fix - declare empty array for data
+	  							pUsers[1] = [ 4 , 6 ]; // temporary fix - currently don't have user data yet
+
+	  							var tmp = [['Twitter'],['Facebook'],['LinkedIn']];
+	  							pPosts[0] = tmp;
+	  							pClicks[0] = tmp;
+	  							pClickrate[0] = tmp;
+	  							pInteractions[0] = tmp;
+	  							// pPosts[1] = pClicks[1] = pClickrate[1] = pInteractions[1] = []; //temporary fix - declare empty array for data
 
 	  							//Constructing sparkline-piechart data input
-	  							for ( var i = 2; i < 5; i++ ) {
+	  							// for ( var i = 2; i < 5; i++ ) {
 
-	  								switch ( currentStream[i][0] ) {
+	  							// 	switch ( currentStream[i][0] ) {
 
-	  									case 3:
+	  							// 		case 3:
 
-	  									pPosts[1][0] = currentStream[i][2];
-	  									pClicks[1][0] = currentStream[i][3];
-	  									pInteractions[1][0] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+	  							// 		pPosts[1][0] = currentStream[i][2];
+	  							// 		pClicks[1][0] = currentStream[i][3];
+	  							// 		pInteractions[1][0] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
 
-	  									//Post can't be zero. If click == 0 -> click rate == 0. 
-	  									if ( pClicks[1][0] == 0 ) pClickrate[1][0] = 0;
-	  									else pClickrate[1][0] = ( pClicks[1][0] / pPosts[1][0] );
+	  							// 		//Post can't be zero. If click == 0 -> click rate == 0. 
+	  							// 		if ( pClicks[1][0] == 0 ) pClickrate[1][0] = 0;
+	  							// 		else pClickrate[1][0] = ( pClicks[1][0] / pPosts[1][0] );
 	  									
-	  									break;
+	  							// 		break;
 
-	  									case 2:
+	  									// case 2:
 
-		  									pPosts[1][1] = currentStream[i][2];
-		  									pClicks[1][1] = currentStream[i][3];
-		  									pInteractions[1][1] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+		  								// 	pPosts[1][1] = currentStream[i][2];
+		  								// 	pClicks[1][1] = currentStream[i][3];
+		  								// 	pInteractions[1][1] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
 
-		  									if ( pClicks[1][1] == 0 ) pClickrate[1][1] = 0;
-		  									else pClickrate[1][1] = ( pClicks[1][1] / pPosts[1][1] );
+		  								// 	if ( pClicks[1][1] == 0 ) pClickrate[1][1] = 0;
+		  								// 	else pClickrate[1][1] = ( pClicks[1][1] / pPosts[1][1] );
 	
-	  									break;
+	  									// break;
 
 
 
-	  									case 4:
+	  									// case 4:
 		  								
-		  									pPosts[1][2] = currentStream[i][2];
-		  									pClicks[1][2] = currentStream[i][3];
-		  									pInteractions[1][2] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
+		  								// 	pPosts[1][2] = currentStream[i][2];
+		  								// 	pClicks[1][2] = currentStream[i][3];
+		  								// 	pInteractions[1][2] = currentStream[i][3] + currentStream[i][4] + currentStream[i][5] + currentStream[i][6];
 
-		  									if ( pClicks[1][2] == 0 ) pClickrate[1][2] = 0;
-		  									else pClickrate[1][2] = ( pClicks[1][2] / pPosts[1][2] );
+		  								// 	if ( pClicks[1][2] == 0 ) pClickrate[1][2] = 0;
+		  								// 	else pClickrate[1][2] = ( pClicks[1][2] / pPosts[1][2] );
 	  									
-	  									break;
+	  									// break;
 
-	  								}
+	  							// 	}
 
-	  							}
+	  							// }
 
-	  							// console.log(pPosts, pUsers, pClicks, pClickrate, pInteractions);
-	  							constructSparklinePiechart( pPosts, pUsers, pClicks, pClickrate, pInteractions );
-	  							displaySummaryWindow( previousTotalStream, currentTotalStream );
+	  							// console.log("post: ", pPosts, "user: ", pUsers, "click: ", pClicks, "clickrate: ", pClickrate, "interaction: ", pInteractions);
+
+	  							// console.dir({ "post": pPosts, "user": pUsers, "click": pClicks, "clickrate": pClickrate, "interaction": pInteractions});
+
+	  							// constructSparklinePiechart( pPosts, pUsers, pClicks, pClickrate, pInteractions );
+	  							// displaySummaryWindow( previousTotalStream, currentTotalStream );
 	  							
 							}
 							else {
