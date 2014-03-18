@@ -241,17 +241,18 @@
 	/*background-color: #f2f2f2;*/
 	padding: 20px;
 	padding-top: 0px;
-	text-align: center;
+	/*text-align: center;*/
 }
 
 .charts-container {
 	padding: 10px;
-	width: 80%;
+	width: 95%;
 	display: inline-block;
 }
 
 .mode-btn {
-	text-align: right;
+	width: 5%;
+	float: right;
 	margin-bottom: 10px;
 	display: block;
 }
@@ -324,12 +325,15 @@
 }
 
 .combinechart {
-	width: 100%; 
+	width: 87%; 
 	height: 300px; 
 	margin: 0 auto;
 }
 
 .btn-custom {
+	border-radius: 0px;
+	width: 50px;
+	display: block;
 	font-size: 11px !important;
 	font-weight: bold;
 	padding: 8px 7px;
@@ -353,13 +357,22 @@
 
 .btn-custom:hover {
 	border-color: #ccc;
-	box-shadow: inset 0px 1px 2px rgba(0,0,0,.2);
+	box-shadow: inset 0px 0px 2px rgba(0,0,0,.2);
+	/*box-shadow: inset 0px 1px 2px rgba(0,0,0,.2);*/
 	color: #222;
 	background-position: initial;
 }
 
 .btn-custom:focus {
 	outline: none;
+}
+
+.btn-custom-top {
+	border-radius: 5px 5px 0px 0px;
+}
+
+.btn-custom-btm {
+	border-radius: 0px 0px 5px 5px;
 }
 
 .tab-custom-container {

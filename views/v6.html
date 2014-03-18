@@ -409,8 +409,11 @@
 	  				$('.piechart1').sparkline( val1[1], {
 	  					type 	: 'pie',
 	  					width 	: '50px',
-	  					height	: '100%',
-	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					height	: '25px',
+	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
+	  					// sliceColors: ['#50b432', '#058dc7', '#EF4035'],
+	  					// sliceColors: ['#a6cee3', '#1f78b4', '#b2df8a'],
+	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val1[0]
 	  					}
@@ -419,18 +422,23 @@
 	  				$('.piechart2').sparkline( val2[1], {
 	  					type 	: 'pie',
 	  					width 	: '50px',
-	  					height 	: '100%',
-	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					height	: '25px',
+	  					// sliceColors: ['#50b432', '#058dc7', '#EF4035'],
+	  					// sliceColors: ['#2ca25f', '#99d8c9'],
+	  					sliceColors: ['#e6550d', '#a63603'],
+	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val2[0]
-	  					}
+	  					},
+
 	  				});
 
 	  				$('.piechart3').sparkline( val3[1], {
 	  					type 	: 'pie',
 	  					width 	: '50px',
-	  					height 	: '100%',
-	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					height	: '25px',
+	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
+	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val3[0]
 	  					}
@@ -439,8 +447,9 @@
 	  				$('.piechart4').sparkline( val4[1], {
 	  					type 	: 'pie',
 	  					width 	: '50px',
-	  					height	: '100%',
-	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					height	: '25px',
+	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
+	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val4[0]
 	  					}
@@ -449,8 +458,9 @@
 	  				$('.piechart5').sparkline( val5[1], {
 	  					type 	: 'pie',
 	  					width 	: '50px',
-	  					height 	: '100%',
-	  					tooltipFormat: '{{offset:slice}}: {{percent.0}}%',
+	  					height	: '25px',
+	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
+	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val5[0]
 	  					}
@@ -521,11 +531,38 @@
 			            		}
 			            	}			                
 			            },
-			            yAxis: {
-			            	title : {
-			            		text: null
-			            	}
-			            },
+			            yAxis: [{ // Primary yAxis
+			            			min: 0,
+			            			gridLineColor: 'rgba(0,0,0,.05)',
+					                title: {
+					                    text: 'Interactions Count',
+					                    style: {
+					                        color: '#89A54E'
+					                    }
+					                },
+					                label: {
+					                	style: {
+					                		color: '#30cd72'
+					                	}
+					                }
+			            		}, { // Secondary yAxis
+			            			min: 0,
+					                title: {
+					                    text: 'Post Count',
+					                    style: {
+					                        color: '#4572A7'
+					                    }
+					                },
+					                opposite: true,
+					                gridLineColor: 'rgba(0,0,0,.05)'
+					            }],
+			            // yAxis: {
+
+			            	// title : {
+			            	// 	text: null
+			            	// },
+			            	// gridLineColor: 'rgba(0,0,0,.05)'
+			            // },
 			            tooltip: {
 			            	xDateFormat: '%A, %b %d, %Y',
 			            	shared: true
@@ -536,11 +573,15 @@
 			            series: [{
 			                type: 'column',
 			                name: 'Posts',
-			                data: posts
+			                yAxis: 1,
+			                data: posts,
+			                color: '#bdc3c7'
 			            }, {
 			                type: 'line',
 			                name: 'Clicks',
-			                data: clicks
+			                yAxis: 0,
+			                data: clicks,
+			                color: '#3498db'
 			                // marker: {
 			                // 	lineWidth: 2,
 			                // 	lineColor: Highcharts.getOptions().colors[3],
@@ -549,15 +590,18 @@
 			            }, {
 			                type: 'line',
 			                name: 'Shares',
-			                data: shares
+			                data: shares,
+			                color: '#f1c40f',
 			            }, {
 			                type: 'line',
 			                name: 'Likes',
-			                data: likes
+			                data: likes,
+			                color: '#e74c3c',
 			            }, {
 			                type: 'line',
 			                name: 'Comments',
-			                data: comments
+			                data: comments,
+			                color: '#34495e'
 			            }]
 			        });
 	  			}
@@ -1149,10 +1193,10 @@
 			
 			<div class="charts-container">
 
-				<div class="btn-group mode-btn">
-					<button id="dayBtn" type="button" class="btn btn-default btn-custom">Day</button>
+				<div class="mode-btn">
+					<button id="dayBtn" type="button" class="btn btn-default btn-custom btn-custom-top">Day</button>
 					<button id="weekBtn" type="button" class="btn btn-default btn-custom">Week</button>
-					<button id="monthBtn" type="button" class="btn btn-default btn-custom">Month</button>
+					<button id="monthBtn" type="button" class="btn btn-default btn-custom btn-custom-btm">Month</button>
 				</div>
 				
 				<div id="combinechart" class="combinechart"></div>
