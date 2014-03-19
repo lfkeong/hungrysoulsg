@@ -163,10 +163,8 @@
 		  			setDateForDatepicker( info );
 
 		  			$(".subsequent-loading-img").hide();
-		  			$("#summaryTab").addClass('active');
-			  		$("#chartTab").addClass('active');
-			  		$("#dayBtn").addClass('active');
-			  		$('#campaignTableTab').addClass('active');
+
+		  			$("#summaryTab, #chartTab, #dayBtn, #campaignTableTab").addClass('active');
 
 			  		//Initialize Summary Screen
 			  		fetchSummaryData( info, businessId );
@@ -766,12 +764,12 @@
   									t += "<td>" + destination[i] + "</td>";
   									t += "<td>" + addCommas( posts[i] ) + "</td>";
   									t += "<td>" + addCommas( clicks[i] ) + "</td>";
-  									t += "<td>" + addCommas( cRate[i] ) + "</td>";
-  									t += "<td>" + addCommas( shares[i] ) + "</td>";
-  									t += "<td>" + addCommas( ampRate[i] ) + "</td>";
   									t += "<td>" + addCommas( likes[i] ) + "</td>";
-  									t += "<td>" + addCommas( appRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( shares[i] ) + "</td>";
   									t += "<td>" + addCommas( comments[i] ) + "</td>";
+  									t += "<td>" + addCommas( cRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( appRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( ampRate[i] ) + "</td>";
   									t += "<td>" + addCommas( convRate[i] ) + "</td>";
   									t += "</tr>";
   								}
@@ -852,12 +850,12 @@
 	  					t += "<td>" + socialMediaArray[i] + "</td>";
 	  					t += "<td>" + addCommas( posts[i] ) + "</td>";
 	  					t += "<td>" + addCommas( clicks[i] ) + "</td>";
-	  					t += "<td>" + addCommas( cRate[i] ) + "</td>";
-	  					t += "<td>" + addCommas( shares[i] ) + "</td>";
-	  					t += "<td>" + addCommas( ampRate[i] ) + "</td>";
 	  					t += "<td>" + addCommas( likes[i] ) + "</td>";
-	  					t += "<td>" + addCommas( appRate[i] ) + "</td>";
+	  					t += "<td>" + addCommas( shares[i] ) + "</td>";
 	  					t += "<td>" + addCommas( comments[i] ) + "</td>";
+	  					t += "<td>" + addCommas( cRate[i] ) + "</td>";
+	  					t += "<td>" + addCommas( appRate[i] ) + "</td>";
+	  					t += "<td>" + addCommas( ampRate[i] ) + "</td>";
 	  					t += "<td>" + addCommas( convRate[i] ) + "</td>";
 	  					t += "</tr>";
 	  				}
@@ -927,12 +925,12 @@
   									t += "<td>" + postArray[i] + "</td>";
   									// t += "<td>" + addCommas( posts[i] ) + "</td>";
   									t += "<td>" + addCommas( clicks[i] ) + "</td>";
-  									t += "<td>" + addCommas( cRate[i] ) + "</td>";
-  									t += "<td>" + addCommas( shares[i] ) + "</td>";
-  									t += "<td>" + addCommas( ampRate[i] ) + "</td>";
   									t += "<td>" + addCommas( likes[i] ) + "</td>";
-  									t += "<td>" + addCommas( appRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( shares[i] ) + "</td>";
   									t += "<td>" + addCommas( comments[i] ) + "</td>";
+  									t += "<td>" + addCommas( cRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( appRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( ampRate[i] ) + "</td>";
   									t += "<td>" + addCommas( convRate[i] ) + "</td>";
   									t += "</tr>";
   								}
@@ -1011,12 +1009,12 @@
   									t += "<td>" + userArray[i] + "</td>";
   									t += "<td>" + addCommas( posts[i] ) + "</td>";
   									t += "<td>" + addCommas( clicks[i] ) + "</td>";
-  									t += "<td>" + addCommas( cRate[i] ) + "</td>";
-  									t += "<td>" + addCommas( shares[i] ) + "</td>";
-  									t += "<td>" + addCommas( ampRate[i] ) + "</td>";
   									t += "<td>" + addCommas( likes[i] ) + "</td>";
-  									t += "<td>" + addCommas( appRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( shares[i] ) + "</td>";
   									t += "<td>" + addCommas( comments[i] ) + "</td>";
+  									t += "<td>" + addCommas( cRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( appRate[i] ) + "</td>";
+  									t += "<td>" + addCommas( ampRate[i] ) + "</td>";
   									t += "<td>" + addCommas( convRate[i] ) + "</td>";
   									t += "</tr>"
   								}
@@ -1122,7 +1120,7 @@
 
 				<div class="tab-custom-container">
 					<ul class="tab-custom-ul">
-						<li id="summaryTab" class="summary-tab tab-custom-li">
+						<li id="summaryTab" class="summary-tab tab-custom-li tab-custom-left tab-custom-right">
 							Summary Metrics
 						</li>
 					</ul>
@@ -1294,17 +1292,17 @@
 
 			<div class="tab-custom-container">
 				<ul class="tab-custom-ul">
-					<li id="chartTab" class="chart-tab tab-custom-li">
+					<li id="chartTab" class="chart-tab tab-custom-li tab-custom-left tab-custom-right">
 					Trend
 					</li>
 				</ul>
 			</div>
-			
-			<div class="charts-container">
+				
+			<div class="first-loading-img">
+				<span><img src="img/busy_gray_gray.gif"></span>
+			</div>
 
-				<div class="first-loading-img">
-					<span><img src="img/busy_gray_gray.gif"></span>
-				</div>
+			<div class="charts-container">
 
 				<div class="mode-btn">
 					<button id="dayBtn" type="button" class="btn btn-default btn-custom btn-custom-top">Day</button>
@@ -1322,18 +1320,18 @@
 
 			<div class="tab-custom-container">
 				<ul class="tab-custom-ul">
-					<li id="campaignTableTab" class="table-tab tab-custom-li">Campaigns</li
+					<li id="campaignTableTab" class="table-tab tab-custom-li tab-custom-left">Campaigns</li
 					><li id="socialNetworkTableTab" class="table-tab tab-custom-li">Social Networks</li
 					><li id="contentTableTab" class="table-tab tab-custom-li">Top Content</li
-					><li id="userTableTab" class="table-tab tab-custom-li">Top Users</li>
+					><li id="userTableTab" class="table-tab tab-custom-li tab-custom-right">Top Users</li>
 				</ul>
 			</div>
 
-			<div class="table-container">
+			<div class="first-loading-img">
+				<span><img src="img/busy_gray_gray.gif"></span>
+			</div>
 
-				<div class="first-loading-img">
-					<span><img src="img/busy_gray_gray.gif"></span>
-				</div>
+			<div class="table-container">
 				
 				<div id="campaignTableContainer" class="campaign-table-container hide" data-custom-state="default">
 					
@@ -1365,8 +1363,8 @@
 
 								<tr class="table-table-header">
 	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='like'>Likes/ Favorites</th>
-	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
+	  								<th class='m-width' data-tt='like'>Likes + Favorites</th>
+	  								<th class='m-width' data-tt='share'>Shares + Retweets</th>
 	  								<th class='m-width' data-tt='comment'>Comments</th>
 	  								
 	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
@@ -1403,8 +1401,8 @@
 
 								<tr class="table-table-header">
 	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='like'>Likes/ Favorites</th>
-	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
+	  								<th class='m-width' data-tt='like'>Likes + Favorites</th>
+	  								<th class='m-width' data-tt='share'>Shares + Retweets</th>
 	  								<th class='m-width' data-tt='comment'>Comments</th>
 	  								
 	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
@@ -1441,8 +1439,8 @@
 
 								<tr class="table-table-header">
 	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='like'>Likes/ Favorites</th>
-	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
+	  								<th class='m-width' data-tt='like'>Likes + Favorites</th>
+	  								<th class='m-width' data-tt='share'>Shares + Retweets</th>
 	  								<th class='m-width' data-tt='comment'>Comments</th>
 	  								
 	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
@@ -1479,8 +1477,8 @@
 
 								<tr class="table-table-header">
 	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='like'>Likes/ Favorites</th>
-	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
+	  								<th class='m-width' data-tt='like'>Likes + Favorites</th>
+	  								<th class='m-width' data-tt='share'>Shares + Retweets</th>
 	  								<th class='m-width' data-tt='comment'>Comments</th>
 	  								
 	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>

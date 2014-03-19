@@ -1,6 +1,7 @@
-/* General CSS */
+/******************************** General CSS ********************************/
 .first-loading-img {
 	text-align: center;
+	margin-top: 15px;
 }
 
 .tab-custom-container {
@@ -45,6 +46,14 @@
 	background-position: initial;
 }
 
+.tab-custom-left {
+	border-top-left-radius: 3px;
+}
+
+.tab-custom-right {
+	border-top-right-radius: 3px;
+}
+
 .center {
 	text-align: center !important;
 }
@@ -53,7 +62,7 @@
 	display: inline-block !important;
 }
 
-/*	Header Section	*/
+/********************************	Header Section	********************************/
 
 .header-section {
 	padding: 20px 20px 0px 20px;
@@ -88,7 +97,7 @@
 	margin-left: 10px;
 }
 
-/*	Summary Section	*/
+/*******************************	Summary Section	********************************/
 
 .summary-section {
 	padding: 20px;
@@ -171,7 +180,7 @@
 	color: red;
 }
 
-/*	Chart Section	*/
+/********************************	Chart Section	********************************/
 
 .chart-section {
 	padding: 20px;
@@ -243,7 +252,7 @@
 	border-radius: 0px 0px 5px 5px;
 }
 
-/*	Table Section	*/
+/********************************	Table Section	********************************/
 
 .table-section {
 	padding: 20px;
