@@ -46,6 +46,10 @@ app.get('/analytics/v6', function(req, res){
   res.render('v6.html',{});
 });
 
+app.get('/analytics/v7', function(req, res){
+  res.render('v7.html',{});
+});
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });

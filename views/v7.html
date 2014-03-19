@@ -10,7 +10,7 @@
 		<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
 		<link rel="stylesheet" type="text/css" href="css/theme.bootstrap.css">
-		<link rel="stylesheet" type="text/css" href="css/new4.css" />
+		<link rel="stylesheet" type="text/css" href="css/new5.css" />
 
 		<!-- Bootstrap, jQuery and jQuery-UI -->
 		<script type="text/javascript" src="js/jquery-1.8.3.js"></script>
@@ -49,6 +49,7 @@
 		  			ttComments  	= "Number of comments on Facebook and LinkedIn",
 		  			ttConvRate  	= "Number of comments per post.";
 
+		  		//jQuery tablesorter plug-in class initiation
 	  			$.extend($.tablesorter.themes.bootstrap, {
 				    // these classes are added to the table. To see other table classes available,
 				    // look here: http://twitter.github.com/bootstrap/base-css.html#tables
@@ -98,8 +99,6 @@
 
 				$(".table-tab").click( function () {
 
-					$()
-
 					$(".table-tab").removeClass('active');
 					$(this).addClass('active');
 
@@ -124,10 +123,12 @@
 
 		  			//Initialize Datepickers
 		  			$('#from').datepicker({
-		  				// defaultDate: "+1w",
 		  				maxDate:0,
 		  				onSelect: function( selectedDate ) {
 		  					$( "#to" ).datepicker( "option", "minDate", selectedDate );
+		  					$('.subsequent-loading-img').show();
+		  					toggleTableState(); 
+
 		  					var date = getDateFromDatepicker();
 		  					fetchSummaryData( date, businessId );
 		  					fetchChartingData( date, businessId );
@@ -138,10 +139,12 @@
 		  			});
 
 		  			$('#to').datepicker({
-		  				// defaultDate: "+1w",
 		  				maxDate:0,
 		  				onSelect: function( selectedDate ) {
 		  					$( "#from" ).datepicker( "option", "maxDate", selectedDate );
+		  					$('.subsequent-loading-img').show();
+		  					toggleTableState(); 
+
 		  					var date = getDateFromDatepicker();
 		  					fetchSummaryData( date, businessId );
 		  					fetchChartingData( date, businessId );
@@ -152,23 +155,23 @@
 		  			});
 
 		  			//Pre-setting default date - 30 days
-					var last90Days = new Date(), currentDay = new Date();
-					// var last30Days = new Date(), currentDay = new Date();
+					var last30Days = new Date(), currentDay = new Date();
 					var info = {
-						// s : new Date(last30Days.setDate(last30Days.getDate()-30)),
-						s : new Date(last90Days.setDate(last90Days.getDate()-90)),
+						s : new Date(last30Days.setDate(last30Days.getDate()-30)),
 						e : currentDay
 					}
 		  			setDateForDatepicker( info );
+
+		  			$(".subsequent-loading-img").hide();
+		  			$("#summaryTab").addClass('active');
+			  		$("#chartTab").addClass('active');
+			  		$("#dayBtn").addClass('active');
+			  		$('#campaignTableTab').addClass('active');
 
 			  		//Initialize Summary Screen
 			  		fetchSummaryData( info, businessId );
 
 			  		//Initialize Charts/Graphs
-			  		$("#summaryTab").addClass('active');
-			  		$("#chartTab").addClass('active');
-			  		$("#dayBtn").addClass('active');
-			  		$('#campaignTableTab').addClass('active');
 			  		fetchChartingData( info, businessId );
 
 	  				//Initialize Tables
@@ -256,6 +259,60 @@
 	  				}
 	  				return x1 + x2;
 	  			}
+
+	  			function initiateTooltips () {
+					console.log("inside", ttPosts, ttClicks);
+					var tooltipOptions = {
+						"show"		: true,
+						"placement"	: "top", 
+						"trigger"	: "hover",
+						"delay"		: { show: 500, hide: 100 },
+						"container" : "body"
+					}
+
+					var dom = document.querySelectorAll('[data-tt]');
+
+					for ( var i = 0; i < dom.length; i++ ) {
+
+						switch ( dom[i].getAttribute("data-tt") ) {
+						case "post" : tooltipOptions.title = ttPosts;
+						break 
+						case "user" : tooltipOptions.title = ttUsers;
+						break 
+						case "click" : tooltipOptions.title = ttClicks;
+						break 
+						case "clickRate" : tooltipOptions.title = ttClickRate;
+						break 
+						case "interaction" : tooltipOptions.title = ttInteractions;
+						break 
+						case "destination" : tooltipOptions.title = ttDestination;
+						break 
+						case "socialNetwork" : tooltipOptions.title = ttSocialNetwork;
+						break 
+						case "title" : tooltipOptions.title = ttTitle;
+						break 
+						case "share" : tooltipOptions.title = ttShares;
+						break 
+						case "ampRate" : tooltipOptions.title = ttAmpRate;
+						break 
+						case "like" : tooltipOptions.title = ttLikes;
+						break 
+						case "appRate" : tooltipOptions.title = ttAppRate;
+						break 
+						case "comment" : tooltipOptions.title = ttComments;
+						break 
+						case "convRate" : tooltipOptions.title = ttConvRate;
+						break
+
+						} 
+						$(dom[i]).tooltip( tooltipOptions );
+					}
+				}
+
+	  			function toggleTableState () {
+					$('#campaignTableContainer, #socialNetworkTableContainer, #contentTableContainer, #userTableContainer')
+					.attr("data-custom-state", "update");
+				}
 
 	  			/************************************* SUMMARY SCREEN FUNCTIONS ****************************/
 
@@ -451,8 +508,6 @@
 	  					width 	: '50px',
 	  					height	: '25px',
 	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
-	  					// sliceColors: ['#50b432', '#058dc7', '#EF4035'],
-	  					// sliceColors: ['#a6cee3', '#1f78b4', '#b2df8a'],
 	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val1[0]
@@ -463,8 +518,6 @@
 	  					type 	: 'pie',
 	  					width 	: '50px',
 	  					height	: '25px',
-	  					// sliceColors: ['#50b432', '#058dc7', '#EF4035'],
-	  					// sliceColors: ['#2ca25f', '#99d8c9'],
 	  					sliceColors: ['#e6550d', '#a63603'],
 	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
@@ -538,7 +591,7 @@
 	  							
 	  							// dates = parseDate( "output", dates );
 	  							inputDate = parseDate( "unixTS", inputDate );
-	  							console.log(inputDate);
+
 	  							// constructCombineChart( dates, posts, clicks, shares, likes,comments);
 	  							constructCombineChart( inputDate, posts, clicks, shares, likes,comments);
   							}
@@ -566,9 +619,6 @@
 			            },
 			            xAxis: {
 			            	type: 'datetime',
-			            	// dateTimeLabelFormats: {
-			            	// 	day: '%e %b'
-			            	// }
 			            	labels: {
 			            		formatter: function () {
 			            			var tmp = $.datepicker.parseDate("@", this.value);
@@ -622,7 +672,6 @@
 			            	pointStart: dates.s,
 			                type: 'line',
 			                name: 'Clicks',
-			                yAxis: 0,
 			                data: clicks,
 			                color: '#3498db'
 			                // marker: {
@@ -653,6 +702,10 @@
 			                color: '#34495e'
 			            }]
 			        });
+					
+					$(".subsequent-loading-img").hide();
+					$('.first-loading-img').hide() //Campaign table is default table, hide loading img
+
 	  			}
 
 	  			/************************************* TABLES FUNCTIONS *************************************/
@@ -725,7 +778,13 @@
 
   								$('#campaignTable > tbody').html(t);
 
-  								initiateTablesorter( "campaign" );
+  								if( $('#campaignTableContainer').attr('data-custom-state') == "default" ) {
+  									$('#campaignTableContainer').show();
+  									initiateTablesorter( "campaign" );
+  								}
+  								else {
+  									$('#campaignTable').trigger('update');
+  								}
 
   							}
   							else {
@@ -805,7 +864,9 @@
 
 	  				$('#socialNetworkTable > tbody').html(t);
 
-	  				initiateTablesorter( "socialNetwork" );
+
+	  				if( $('#socialNetworkTableContainer').attr('data-custom-state') == "default" ) initiateTablesorter( "socialNetwork" );
+	  				else $('#socialNetworkTable').trigger('update');
 
 	  			}
 
@@ -878,7 +939,8 @@
 
   								$('#contentTable > tbody').html(t);
 
-  								initiateTablesorter( "content" );
+  								if( $('#contentTableContainer').attr('data-custom-state') == "default" ) initiateTablesorter( "content" );
+  								else $('#contentTable').trigger('update');
 
   							}
   							else {
@@ -961,8 +1023,10 @@
 
   								$('#userTable > tbody').html(t);
 
-  								initiateTablesorter( "user" );
-
+  								
+  								if( $('#userTableContainer').attr('data-custom-state') == "default" ) initiateTablesorter( "user" );
+  								else $('#userTable').trigger('update');
+  
   							}
   							else {
 	  							//return status = false
@@ -975,55 +1039,6 @@
  	  						console.log("GetUserStream API failure, server error");
  	  					}
  	  				});
-				}
-
-				function initiateTooltips () {
-					console.log("inside", ttPosts, ttClicks);
-					var tooltipOptions = {
-						"show"		: true,
-						"placement"	: "top", 
-						"trigger"	: "hover",
-						"delay"		: { show: 500, hide: 100 },
-						"container" : "body"
-					}
-
-					var dom = document.querySelectorAll('[data-tt]');
-
-					for ( var i = 0; i < dom.length; i++ ) {
-
-						switch ( dom[i].getAttribute("data-tt") ) {
-						case "post" : tooltipOptions.title = ttPosts;
-						break 
-						case "user" : tooltipOptions.title = ttUsers;
-						break 
-						case "click" : tooltipOptions.title = ttClicks;
-						break 
-						case "clickRate" : tooltipOptions.title = ttClickRate;
-						break 
-						case "interaction" : tooltipOptions.title = ttInteractions;
-						break 
-						case "destination" : tooltipOptions.title = ttDestination;
-						break 
-						case "socialNetwork" : tooltipOptions.title = ttSocialNetwork;
-						break 
-						case "title" : tooltipOptions.title = ttTitle;
-						break 
-						case "share" : tooltipOptions.title = ttShares;
-						break 
-						case "ampRate" : tooltipOptions.title = ttAmpRate;
-						break 
-						case "like" : tooltipOptions.title = ttLikes;
-						break 
-						case "appRate" : tooltipOptions.title = ttAppRate;
-						break 
-						case "comment" : tooltipOptions.title = ttComments;
-						break 
-						case "convRate" : tooltipOptions.title = ttConvRate;
-						break
-
-						} 
-						$(dom[i]).tooltip( tooltipOptions );
-					}
 				}
 
 				function initiateTablesorter ( type ) {
@@ -1093,6 +1108,10 @@
 					<input id="to" type="text" class="datepicker">
 				</div>
 
+				<div class="select-date-column subsequent-loading-img">
+					<span><img src="img/busy_gray_gray.gif"></span>
+				</div>
+
 			</div>	
 
 		</section>
@@ -1109,7 +1128,7 @@
 					</ul>
 				</div>
 
-				<div class="summary-table-container divider-btm">
+				<div class="summary-table-container">
 					
 					<table class="summary-table">
 						
@@ -1133,7 +1152,7 @@
 													
 													<div class="summary-col-right">
 														<div class="sparkline-piechart piechart-position">
-															<span id="postPiechart" class="piechart1">Loading...</span>
+															<span id="postPiechart" class="piechart1"><img src="img/busy_gray_gray.gif"></span>
 														</div>
 													</div>
 
@@ -1162,7 +1181,7 @@
 													
 													<div class="summary-col-right">
 														<div class="sparkline-piechart piechart-position">
-															<span id="userPiechart" class="piechart2">Loading...</span>
+															<span id="userPiechart" class="piechart2"><img src="img/busy_gray_gray.gif"></span>
 														</div>
 													</div>
 
@@ -1191,7 +1210,7 @@
 													
 													<div class="summary-col-right">
 														<div class="sparkline-piechart piechart-position">
-															<span id="clickPiechart" class="piechart3">Loading...</span>
+															<span id="clickPiechart" class="piechart3"><img src="img/busy_gray_gray.gif"></span>
 														</div>
 													</div>
 
@@ -1220,7 +1239,7 @@
 													
 													<div class="summary-col-right">
 														<div class="sparkline-piechart piechart-position">
-															<span id="clickRatePiechart" class="piechart4">Loading...</span>
+															<span id="clickRatePiechart" class="piechart4"><img src="img/busy_gray_gray.gif"></span>
 														</div>
 													</div>
 
@@ -1249,7 +1268,7 @@
 													
 													<div class="summary-col-right">
 														<div class="sparkline-piechart piechart-position">
-															<span id="interactionPiechart" class="piechart5">Loading...</span>
+															<span id="interactionPiechart" class="piechart5"><img src="img/busy_gray_gray.gif"></span>
 														</div>
 													</div>
 
@@ -1283,6 +1302,10 @@
 			
 			<div class="charts-container">
 
+				<div class="first-loading-img">
+					<span><img src="img/busy_gray_gray.gif"></span>
+				</div>
+
 				<div class="mode-btn">
 					<button id="dayBtn" type="button" class="btn btn-default btn-custom btn-custom-top">Day</button>
 					<button id="weekBtn" type="button" class="btn btn-default btn-custom">Week</button>
@@ -1308,7 +1331,11 @@
 
 			<div class="table-container">
 
-				<div id="campaignTableContainer" class="campaign-table-container">
+				<div class="first-loading-img">
+					<span><img src="img/busy_gray_gray.gif"></span>
+				</div>
+				
+				<div id="campaignTableContainer" class="campaign-table-container hide" data-custom-state="default">
 					
 					<h5 class="inline">Campaign Performance Summary</h5>
 					<div class="social-network-select-container">
@@ -1333,7 +1360,7 @@
 	  								<th class='m-width' colspan="1" rowspan="2" data-tt='destination' data-sorter="false">Destination</th>
 	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
 	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions Rate</th>
+	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
 	  							</tr>
 
 								<tr class="table-table-header">
@@ -1358,7 +1385,7 @@
 
 				</div>
 			
-				<div id="socialNetworkTableContainer" class="social-network-table-container hide">
+				<div id="socialNetworkTableContainer" class="social-network-table-container hide" data-custom-state="default">
 					
 					<h5>Social Network Performance Summary</h5>
 					
@@ -1366,19 +1393,25 @@
 					
 						<table id="socialNetworkTable" class="table table-hover table-bordered">
 							<thead>
-								
+
+				  				<tr class="table-table-header"> 
+	  								<th colspan="1" rowspan="2" data-sorter="false">Social Network</th>
+	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
+	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
+	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
+	  							</tr>
+
 								<tr class="table-table-header">
-					  				<th data-tt='socialNetwork'>Social Network</th>
-					  				<th class='m-width' data-tt='post'>Posts</th>
-					  				<th class='m-width' data-tt='click'>Clicks</th>
-					  				<th class='m-width' data-tt='clickRate'>Click Rate</th>
-					  				<th class='m-width' data-tt='share'>Shares/ Retweets</th>
-					  				<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
-					  				<th class='m-width' data-tt='like'>Likes/ Favorites</th>
-					  				<th class='m-width' data-tt='appRate'>Applause Rate</th>
-					  				<th class='m-width' data-tt='comment'>Comments</th>
-					  				<th class='m-width' data-tt='convRate'>Conversation Rate</th>
-				  				</tr>
+	  								<th class='m-width' data-tt='click'>Clicks</th>
+	  								<th class='m-width' data-tt='like'>Likes/ Favorites</th>
+	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
+	  								<th class='m-width' data-tt='comment'>Comments</th>
+	  								
+	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
+	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
+	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
+	  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
+	  							</tr>
 							
 							</thead>
 							<tbody class="social-network-table-body table-table-body">
@@ -1390,7 +1423,7 @@
 
 				</div>
 
-				<div id="contentTableContainer" class="content-table-container hide">
+				<div id="contentTableContainer" class="content-table-container hide" data-custom-state="default">
 					
 					<h5>Top Content Summary</h5>
 					
@@ -1399,16 +1432,22 @@
 						<table id="contentTable" class="table table-hover table-bordered">
 							<thead>
 								
+	  							<tr class="table-table-header"> 
+	  								<th colspan="1" rowspan="2" data-sorter="false">Title</th>
+	  								<!-- <th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th> -->
+	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
+	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
+	  							</tr>
+
 								<tr class="table-table-header">
-	  								<th data-tt='title'>Title</th>
-	  								<!-- <th class='m-width' data-tt='post'>Posts</th> -->
 	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
-	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
-	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
 	  								<th class='m-width' data-tt='like'>Likes/ Favorites</th>
-	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
+	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
 	  								<th class='m-width' data-tt='comment'>Comments</th>
+	  								
+	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
+	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
+	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
 	  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
 	  							</tr>
 							
@@ -1422,7 +1461,7 @@
 
 				</div>
 			
-				<div id="userTableContainer" class="user-table-container hide">
+				<div id="userTableContainer" class="user-table-container hide" data-custom-state="default">
 					
 					<h5>Top Users Summary</h5>
 					
@@ -1431,16 +1470,22 @@
 						<table id="userTable" class="table table-hover table-bordered">
 							<thead>
 								
+				  				<tr class="table-table-header"> 
+	  								<th colspan="1" rowspan="2" data-sorter="false">User</th>
+	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
+	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
+	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
+	  							</tr>
+
 								<tr class="table-table-header">
-	  								<th>User</th>
-	  								<th class='m-width' data-tt='post'>Posts</th>
 	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
-	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
-	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
 	  								<th class='m-width' data-tt='like'>Likes/ Favorites</th>
-	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
+	  								<th class='m-width' data-tt='share'>Shares/ Retweets</th>
 	  								<th class='m-width' data-tt='comment'>Comments</th>
+	  								
+	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
+	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
+	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
 	  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
 	  							</tr>
 							
