@@ -50,6 +50,10 @@ app.get('/analytics/v7', function(req, res){
   res.render('v7.html',{});
 });
 
+app.get('/analytics/drilldown', function(req, res){
+  res.render('drilldown.html',{});
+});
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });

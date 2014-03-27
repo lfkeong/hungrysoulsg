@@ -29,7 +29,7 @@
 
 	  		$( function () {
 
-	  			var businessId = 53; //temporary fix
+	  			var businessId = 1; //temporary fix
 	  			
 	  			//Tooltips Variables
 	  			var ttPosts 		= "Number of posts to social touchpoints",
@@ -167,20 +167,243 @@
 		  			$("#summaryTab, #chartTab, #dayBtn, #campaignTableTab").addClass('active');
 
 			  		//Initialize Summary Screen
-			  		fetchSummaryData( info, businessId );
+			  		// fetchSummaryData( info, businessId );
 
 			  		//Initialize Charts/Graphs
-			  		fetchChartingData( info, businessId );
-
+			  		// fetchChartingData( info, businessId );
+			  		test( info, businessId ); 
 	  				//Initialize Tables
-	  				constructCampaignTable( info, businessId );
-	  				constructContentTable( info, businessId );
-	  				constructUserTable( info, businessId );
+	  				// constructCampaignTable( info, businessId );
+	  				// constructContentTable( info, businessId );
+	  				// constructUserTable( info, businessId );
 
 	  				//Initialize Tooltips
-	  				initiateTooltips();
+	  				// initiateTooltips();
 
 	  			}
+
+	  			/***************************** EXPERIMENT / TESTING ********************************/
+
+	  			function test ( date, bizId ) {
+
+	  				var inputDate = parseDate( "input", date );
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetDailyStream";
+
+	  				$.ajax({
+	  					url : url,
+	  					type : "GET",
+	  					data : {
+	  						businessId 	: bizId,
+	  						startDate 	: inputDate.s,
+	  						endDate 	: inputDate.e
+	  					},
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+
+	  							var clicks = [], shares = [], likes = [], comments = [], posts = [],
+	  								interactions = [];
+
+	  							for ( var i = 1; i < response.data.stream.length; i++ ) {
+	  								var dailyStream = response.data.stream;
+
+	  								// dates.push( dailyStream[i][0] );
+	  								posts.push( dailyStream[i][1] );
+	  								clicks.push( dailyStream[i][2] );
+	  								likes.push( dailyStream[i][3] );
+	  								shares.push( dailyStream[i][4] );
+	  								comments.push( dailyStream[i][5] );
+
+	  								var tmp = dailyStream[i][2] + dailyStream[i][3] + dailyStream[i][4] + dailyStream[i][5];
+	  								interactions.push( tmp );
+
+	  							}
+
+	  							inputDate = parseDate( "unixTS", inputDate );
+								testingChart( inputDate, posts, clicks, shares, likes, comments, interactions);
+
+
+	  						}
+	  						else {
+	  							console.log("GetBusinessOverview API failure, return status false: ", url);
+	  						}
+	  					},
+	  					error : function () {
+	  						console.log("GetBusinessOverview API failure, server error"); 
+	  					}
+	  				});
+
+	  				function testingChart ( dates, posts, clicks, shares, likes, comments, interactions ) {
+
+		  				$('#drilldownchart').highcharts({
+				            chart: {
+				            	defaultSeriesType: 'scatter',
+				            	events: {
+				            	 	selection: function( event ) {
+
+				            	 		event.preventDefault();
+
+				            	 		for ( var i = 0; i < this.series[0].data.length; i++ ) {
+				            	 			this.series[0].data[i].select( false, true );
+				            	 			this.series[1].data[i].select( false, true );
+				            	 		}
+				            	 		var specialAgent = [];
+				            	 		for ( var i = 0; i < this.series[0].data.length; i++ ) {
+
+				            	 			var point1 = this.series[0].data[i], 	//post column series
+				            	 				point2 = this.series[1].data[i]; 	//interaction line series
+
+				            	 			var xAxisMax = event.xAxis[0].max, xAxisMin = event.xAxis[0].min,
+				            	 				yAxisMax1 = event.yAxis[1].max, yAxisMin1 = event.yAxis[1].min, //post column series
+				            	 				yAxisMax2 = event.yAxis[0].max, yAxisMin2 = event.yAxis[0].min; //interaction line series
+
+				            	 			if ( point1.x > xAxisMin && point1.x < xAxisMax &&
+				            	 				point1.y > yAxisMin1 && point1.y < yAxisMax1 ) 
+				            	 			{
+				            	 				point1.select( true, true );
+				            	 				point2.select( true, true );
+				            	 				console.log(i);
+				            	 				specialAgent.push(i);
+				            	 			}
+
+				            	 			if ( !point1.selected ) {
+				            	 				if ( point2.x > xAxisMin && point2.x < xAxisMax &&
+				            	 					point2.y > yAxisMin2 && point2.y < yAxisMax2 )
+				            	 				{
+				            	 					point1.select( true, true );
+				            	 					point2.select( true, true );
+				            	 					specialAgent.push(i);
+				            	 				}
+				            	 				
+				            	 			}
+				            	 		}
+				            	 		var chart = $('#drilldownchart').highcharts(),
+				            	 			selectedPoints = chart.getSelectedPoints();
+
+				            	 		buildingCustomizedTable( selectedPoints, specialAgent, clicks, shares, likes, comments );
+
+				            		}
+				            	},
+				            	zoomType: 'xy'
+				            },
+				            title: {
+				                text: null
+				            },
+				            xAxis: {
+				            	type: 'datetime',
+				            	labels: {
+				            		formatter: function () {
+				            			var tmp = $.datepicker.parseDate("@", this.value);
+				            			var d = $.datepicker.formatDate("dd M", tmp);
+			            				return d;
+				            		}
+				            	}			                
+				            },
+				            yAxis: [{ // Primary yAxis
+				            			min: 0,
+				            			gridLineColor: 'rgba(0,0,0,.05)',
+						                title: {
+						                    text: 'Interactions',
+						                    style: {
+						                        color: '#89A54E'
+						                    }
+						                },
+						                label: {
+						                	style: {
+						                		color: '#30cd72'
+						                	}
+						                }
+				            		}, { // Secondary yAxis
+				            			min: 0,
+						                title: {
+						                    text: 'Posts',
+						                    style: {
+						                        color: '#4572A7'
+						                    }
+						                },
+						                opposite: true,
+						                gridLineColor: 'rgba(0,0,0,.05)'
+						            }],
+				            tooltip: {
+				            	xDateFormat: '%A, %b %d, %Y',
+				            	shared: true
+				            },
+				            // plotOptions: {
+				            // 	series: {
+				            // 		cursor: 'pointer',
+				            // 		allowPointSelect: true,
+				            // 		point: {
+				            // 			events: {
+				            // 				select: function() {
+				            // 					console.log(this);
+				            // 				}
+				            // 			}
+				            // 		}
+				            // 	}
+				            // },
+				            exporting: {
+				            	enabled: false
+				            },
+				            series: [{
+				            	pointInterval: 24 * 3600 * 1000,
+				            	pointStart: dates.s,
+				                type: 'column',
+				                name: 'Posts',
+				                yAxis: 1,
+				                data: posts,
+				                color: '#bdc3c7'
+				            }, {
+				            	pointInterval: 24 * 3600 * 1000,
+				            	pointStart: dates.s,
+				                type: 'line',
+				                name: 'Interactions',
+				                data: interactions,
+				                color: '#3498db'
+				            }]
+				        });
+					}
+
+					function buildingCustomizedTable ( array, index, clicks, shares, likes, comments ) {
+
+						var arrayCount = (array.length) / 2,
+							postArray = [], interactionArray = [], tooltipArray = [];
+							
+							var tooltipOptions = {
+								"show"		: true,
+								"placement"	: "top", 
+								"trigger"	: "hover",
+								"delay"		: { show: 500, hide: 100 },
+								"container" : "body"
+							}
+
+
+						for ( var i = 0; i < array.length; i++ ) {
+							if ( i < arrayCount ) postArray.push( array[i] );
+							else interactionArray.push( array[i] );
+						}
+
+						for ( var k = 0; k < arrayCount; k++ ) {
+							var tmp = "clicks: " + clicks[index[k]] + " shares: " + shares[index[k]] + " likes: " + likes[index[k]] + " comments: " + comments[index[k]];
+							tooltipArray.push(tmp);
+						}
+
+						var t = "";
+						for ( var j = 0; j < arrayCount; j++ ) {
+							
+							t += "<tr>";
+							t += "<td>" + postArray[j].y + "</td>";
+							t += "<td id='index" + j + "'>" + interactionArray[j].y + "</td>";
+							t += "</tr>";
+						}
+						$('#testTableBody').html(t);
+
+						for ( var z = 0; z < arrayCount; z++ ) {
+							tooltipOptions.title = tooltipArray[z];
+							$('#index' + z + '').tooltip( tooltipOptions );
+						}
+
+					}
+				}
+
 
 	  			/****************************** GENERAL FUNCTIONS ********************************/
 
@@ -1114,7 +1337,7 @@
 
 		</section>
 
-		<section class="summary-section">
+		<!-- <section class="summary-section">
 
 			<div class="summary-container">
 
@@ -1286,7 +1509,7 @@
 				
 			</div>
 
-		</section>
+		</section> -->
 
 		<section class="chart-section">
 
@@ -1304,13 +1527,28 @@
 
 			<div class="charts-container">
 
-				<div class="mode-btn">
+				<!-- <div class="mode-btn">
 					<button id="dayBtn" type="button" class="btn btn-default btn-custom btn-custom-top">Day</button>
 					<button id="weekBtn" type="button" class="btn btn-default btn-custom">Week</button>
 					<button id="monthBtn" type="button" class="btn btn-default btn-custom btn-custom-btm">Month</button>
-				</div>
+				</div> -->
 				
-				<div id="combinechart" class="combinechart"></div>
+				<!-- <div id="combinechart" class="combinechart"></div> -->
+				<div id="drilldownchart" class="combinechart"></div>
+
+				<div id="testTableContainer">
+					<table id="testTable">
+						<thead id="testTableHeader">
+							<tr>
+								<th>Posts</th>
+								<th>Interactions</th>
+							</tr>
+						</thead>
+						<tbody id="testTableBody">
+							
+						</tbody>
+					</table>
+				</div>
 
 			</div>
 
@@ -1318,7 +1556,7 @@
 		
 		<section class="table-section">
 
-			<div class="tab-custom-container">
+<!-- 			<div class="tab-custom-container">
 				<ul class="tab-custom-ul">
 					<li id="campaignTableTab" class="table-tab tab-custom-li tab-custom-left">Campaigns</li
 					><li id="socialNetworkTableTab" class="table-tab tab-custom-li">Social Networks</li
@@ -1329,11 +1567,11 @@
 
 			<div class="first-loading-img">
 				<span><img src="img/busy_gray_gray.gif"></span>
-			</div>
+			</div> -->
 
 			<div class="table-container">
 				
-				<div id="campaignTableContainer" class="campaign-table-container hide" data-custom-state="default">
+<!-- 				<div id="campaignTableContainer" class="campaign-table-container hide" data-custom-state="default">
 					
 					<h5 class="inline">Campaign Performance Summary</h5>
 					<div class="social-network-select-container">
@@ -1419,7 +1657,7 @@
 
 					</div>
 
-				</div>
+				</div> -->
 
 				<div id="contentTableContainer" class="content-table-container hide" data-custom-state="default">
 					
@@ -1459,7 +1697,7 @@
 
 				</div>
 			
-				<div id="userTableContainer" class="user-table-container hide" data-custom-state="default">
+<!-- 				<div id="userTableContainer" class="user-table-container hide" data-custom-state="default">
 					
 					<h5>Top Users Summary</h5>
 					
@@ -1494,7 +1732,7 @@
 						</table>
 
 					</div>
-				</div>	
+				</div>	 -->
 
 			</div>
 
