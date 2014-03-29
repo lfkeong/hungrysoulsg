@@ -97,6 +97,56 @@
 					}
 				});
 
+				$(".date-btn-custom").click( function () {
+					$('.date-btn-custom').removeClass('active');
+	  				$(this).addClass('active');
+	  				switch( $(this).attr('id') ) {
+	  					case 'ytdBtn' :
+
+  						var currentDate = new Date (),
+  							year = currentDate.getFullYear(),
+  							date = {
+  								s : new Date ( year, 0, 1),
+  								e : currentDate
+  							}
+
+  						setDateForDatepicker( date );
+  						reloadData();
+
+						break;
+						case 'mtdBtn' :
+
+  						var currentDate = new Date (),
+  							year = currentDate.getFullYear(),
+  							month = currentDate.getMonth(),
+  							date = {
+  								s : new Date ( year, month, 1),
+  								e : currentDate
+  							}
+
+  						setDateForDatepicker( date );
+  						reloadData();
+
+						break;
+						case 'pmBtn' :
+
+  						var currentDate = new Date (),
+  							year = currentDate.getFullYear(),
+  							month = currentDate.getMonth(),
+  							eom = new Date ( year, month );
+  							
+  							date = {
+  								s : new Date ( year, month -1, 1),
+  								e : new Date ( eom.setDate(eom.getDate()-1) )
+  							}
+
+  						setDateForDatepicker( date );
+  						reloadData();
+
+						break;
+					}
+				});
+
 				$(".table-tab").click( function () {
 
 					$(".table-tab").removeClass('active');
@@ -117,59 +167,56 @@
 					}
 				});
 
+				$("#restoreDrilldownBtn").click( function () {
+					reloadData();
+					$('.drilldown-restore-container').hide();
+				});
+
 
 	  			/******************************* FUNCTIONS DECLARATION ****************************/
 	  			function init () {
 
 		  			//Initialize Datepickers
 		  			$('#from').datepicker({
-		  				maxDate:0,
+		  				maxDate: 0,
+		  				dateFormat: "D, MM dd, yy",
 		  				onSelect: function( selectedDate ) {
+		  					console.log(selectedDate);
 		  					$( "#to" ).datepicker( "option", "minDate", selectedDate );
 		  					$('.subsequent-loading-img').show();
+		  					$('.date-btn-custom').removeClass('active');
 		  					toggleTableState(); 
-
-		  					var date = getDateFromDatepicker();
-		  					fetchSummaryData( date, businessId );
-		  					fetchChartingData( date, businessId );
-		  					constructCampaignTable( date, businessId );
-		  					constructContentTable( date, businessId );
-		  					constructUserTable( date, businessId );
+		  					reloadData();
 		  				}
 		  			});
 
 		  			$('#to').datepicker({
-		  				maxDate:0,
+		  				minDate: "-30d",
+		  				dateFormat: "D, MM dd, yy",
 		  				onSelect: function( selectedDate ) {
 		  					$( "#from" ).datepicker( "option", "maxDate", selectedDate );
 		  					$('.subsequent-loading-img').show();
+		  					$('.date-btn-custom').removeClass('active');
 		  					toggleTableState(); 
-
-		  					var date = getDateFromDatepicker();
-		  					fetchSummaryData( date, businessId );
-		  					fetchChartingData( date, businessId );
-		  					constructCampaignTable( date, businessId );
-		  					constructContentTable( date, businessId );
-		  					constructUserTable( date, businessId );
+		  					reloadData();
 		  				}
 		  			});
 
-		  			//Pre-setting default date - 30 days
+					//Pre-setting default date - 30 days
 					var last30Days = new Date(), currentDay = new Date();
 					var info = {
 						s : new Date(last30Days.setDate(last30Days.getDate()-30)),
 						e : currentDay
 					}
+
 		  			setDateForDatepicker( info );
 
-		  			$(".subsequent-loading-img").hide();
+		  			$(".subsequent-loading-img, .drilldown-restore-container").hide();
 
 		  			$("#summaryTab, #chartTab, #dayBtn, #campaignTableTab").addClass('active');
 
-			  		//Initialize Summary Screen
+			  		//Initialize Summary Screen, Charts/Graphs
 			  		fetchSummaryData( info, businessId );
-
-			  		//Initialize Charts/Graphs
 			  		fetchChartingData( info, businessId );
 
 	  				//Initialize Tables
@@ -188,7 +235,7 @@
 
 	  				$( "#from" ).datepicker( "setDate", date.s );
 	  				$( "#to" ).datepicker( "setDate", date.e );
-	  			
+
 	  			}
 
 	  			function getDateFromDatepicker () {
@@ -241,6 +288,17 @@
 		  					return parsedDate;
 
 	  					break;
+
+	  					case "drilldown" :
+
+	  						var parsedDate = [];
+
+	  						for ( var i = 0; i < date.length; i++ ) {
+	  							parsedDate[i] = $.datepicker.parseDate("@",date[i]);
+	  						}
+	  						return parsedDate;
+
+	  					break;
 	  				}
 	  			}
 
@@ -259,7 +317,7 @@
 	  			}
 
 	  			function initiateTooltips () {
-					console.log("inside", ttPosts, ttClicks);
+
 					var tooltipOptions = {
 						"show"		: true,
 						"placement"	: "top", 
@@ -312,6 +370,16 @@
 					.attr("data-custom-state", "update");
 				}
 
+				function reloadData () {
+
+					var date = getDateFromDatepicker();
+					fetchSummaryData( date, businessId );
+					fetchChartingData( date, businessId );
+					constructCampaignTable( date, businessId );
+					constructContentTable( date, businessId );
+					constructUserTable( date, businessId );
+				}
+
 	  			/************************************* SUMMARY SCREEN FUNCTIONS ****************************/
 
 	  			function fetchSummaryData ( date, businessId ) {	//Constructing activity and impact summary window
@@ -326,10 +394,10 @@
 	  					type 	: "GET",
 	  					success : function ( response ) {
 
-	  						//pass the same data to construct Social Network Table
-	  						constructSocialNetworkTable( response );
+	  						if ( response.status ) {	
 
-	  						if ( response.status ) {
+		  						//pass the same data to construct Social Network Table
+		  						constructSocialNetworkTable( response );
 
 	  							var previousStream, currentStream, previousTotalStream, currentTotalStream, previousUser, currentUser,
 	  								pPosts = [], pUsers = [], pClicks = [], pClickrate = [], pInteractions = []; //Sparkline-piechart variables declaration
@@ -474,7 +542,10 @@
 
 	  					if( previous != 0 ) {
 	  						value = ( current - previous ) / previous * 100;
-	  						value = value.toFixed(2);
+
+	  						if ( value > 100 ) value = value.toFixed(0);
+	  						else value = value.toFixed(2);
+	  						
 	  						html = '<span class="percentage up"><i class="fa fa-arrow-up">' + value + '%</i></span>';
 	  					}
 	  					else html = '<span class="percentage">--</span>'; //previously data is "zero"
@@ -484,7 +555,10 @@
 
 	  					if ( current != 0 ) {
 	  						value = ( previous - current ) / previous * 100;
-	  						value = value.toFixed(2);
+	  						
+	  						if ( value > 100 ) value = value.toFixed(0);
+	  						else value = value.toFixed(2);
+
 	  						html = '<span class="percentage down"><i class="fa fa-arrow-down">' + value + '%</i></span>';
 	  					}
 	  					else html = '<span class="percentage down"><i class="fa fa-arrow-down">100%</i></span>'; //current data is "zero"
@@ -611,6 +685,86 @@
 
 	  				 $('#combinechart').highcharts({
 			            chart: {
+			            	style: {
+				            		cursor: 'crosshair'
+			            	},
+			            	defaultSeriesType: 'scatter',
+			            	events: {
+			            		selection: function( event ) {
+
+			            			function selectPoint ( point1, point2, point3, point4, point5 ) {
+			            				point1.select( true, true );
+			            				point2.select( true, true );
+			            				point3.select( true, true );
+			            				point4.select( true, true );
+			            				point5.select( true, true );
+			            				return true;
+			            			}
+
+			            			function deSelectPoint ( point1, point2, point3, point4, point5 ) {
+			            				point1.select( false, true );
+			            				point2.select( false, true );
+			            				point3.select( false, true );
+			            				point4.select( false, true );
+			            				point5.select( false, true );
+			            				return false;
+			            			}
+
+			            			function findBiggest ( click, share, like, comment ) {
+			            				var tmpArray = [click, share, like, comment],
+			            					biggest = click;
+
+			            				for ( var i = 0; i < 4; i++ ) {
+			            					if ( tmpArray[i].y > biggest.y ) biggest = tmpArray[i];
+			            				}
+			            				return biggest;
+			            			}
+
+			            			event.preventDefault();
+
+			            			for ( var i = 0; i < this.series[0].data.length; i++ ) {
+
+			            	 			var point1 = this.series[0].data[i], 	//post column series
+			            	 				point2 = this.series[1].data[i], 	//click line series
+			            	 				point3 = this.series[2].data[i], 	//share line series
+			            	 				point4 = this.series[3].data[i],	//like line series
+			            	 				point5 = this.series[4].data[i];	//comment line series
+
+		            	 				var xAxisMax = event.xAxis[0].max, xAxisMin = event.xAxis[0].min,
+		            	 				yAxisMax1 = event.yAxis[1].max, yAxisMin1 = event.yAxis[1].min, //post column series
+		            	 				yAxisMax2 = event.yAxis[0].max, yAxisMin2 = event.yAxis[0].min; //interaction line series
+
+		            	 				deSelectPoint( point1, point2, point3, point4, point5 );
+
+		            	 				if ( point1.x > xAxisMin && point1.x < xAxisMax &&
+		            	 					point1.y > yAxisMin1 ) 
+		            	 				{ selectPoint( point1, point2, point3, point4, point5 ); }
+
+		            	 				if ( !point1.selected ) {
+		            	 					
+		            	 					var mostCount = findBiggest( point2, point3, point4, point5 );
+
+		            	 					if ( mostCount.x > xAxisMin && mostCount.x < xAxisMax &&
+		            	 						mostCount.y > yAxisMin2 && mostCount.y < yAxisMax2 )
+		            	 					{
+		            	 						selectPoint( point1, point2, point3, point4, point5 );
+		            	 					}
+
+		            	 				}
+		            	 			}
+		            	 			var chart = $('#combinechart').highcharts(),
+			            	 			selectedPoints = chart.getSelectedPoints(),
+			            	 			dateRange = [];
+			            	 			console.log(selectedPoints);
+			            	 		if ( selectedPoints.length ) {
+			            	 			for ( var i = 0; i < (selectedPoints.length) / 5; i++ ) {
+			            	 				dateRange.push(selectedPoints[i].x);
+			            	 			}
+			            	 			constructDrilldownTable( dateRange );
+			            	 		}
+		            	 		}
+		            	 	},
+				            zoomType: 'xy'
 			            },
 			            title: {
 			                text: null
@@ -706,6 +860,49 @@
 
 	  			}
 
+	  			function constructDrilldownTable ( dateRange ) {
+	  				console.log (dateRange);
+	  				var tmp = parseDate( "drilldown", dateRange ),
+	  					date = {
+	  						s : tmp[0],
+	  						e : tmp[tmp.length -1]
+	  					}
+
+	  					console.log(date);
+
+	  				var inputDate = parseDate( "input", date );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetBusinessOverview?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) constructSocialNetworkTable( response );
+	  						else {
+								//return status = false
+								console.log(url);
+								console.log("GetBusinessOverview API failture, return status false");
+	  						}
+	  					},
+ 	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetBusinessOverview API failure, server error");
+	  					}
+	  				});
+	  				constructCampaignTable( date, businessId);
+	  				constructContentTable( date, businessId);
+	  				constructUserTable( date, businessId);
+
+	  				var message = "";
+	  				message += "Date range: "
+					message += "<b>" + $.datepicker.formatDate("D, MM dd", date.s);
+	  				message += " to " + $.datepicker.formatDate("D, MM dd", date.e) + " - </b>";
+	  				$('#filterMessage').html( message );
+	  				$('.drilldown-restore-container').show();
+	  			}
+
 	  			/************************************* TABLES FUNCTIONS *************************************/
 
 	  			function constructCampaignTable ( date, businessId ) {
@@ -773,8 +970,7 @@
   									t += "<td>" + addCommas( convRate[i] ) + "</td>";
   									t += "</tr>";
   								}
-
-  								$('#campaignTable > tbody').html(t);
+  								$('#campaignTable > .campaign-table-body').html(t);
 
   								if( $('#campaignTableContainer').attr('data-custom-state') == "default" ) {
   									$('#campaignTableContainer').show();
@@ -860,7 +1056,7 @@
 	  					t += "</tr>";
 	  				}
 
-	  				$('#socialNetworkTable > tbody').html(t);
+	  				$('#socialNetworkTable > .social-network-table-body').html(t);
 
 
 	  				if( $('#socialNetworkTableContainer').attr('data-custom-state') == "default" ) initiateTablesorter( "socialNetwork" );
@@ -880,40 +1076,69 @@
 	  					type 	: "GET",
 	  					success : function ( response ) {
 	  						if ( response.status ) {
-	  							var stream, postArray = [],
+	  							var stream, postArray = [], posts = [],
 	  								clicks = [], likes = [], shares = [], comments = [],
 	  								cRate = [], ampRate = [], appRate = [], convRate = [];
 
 	  							stream = response.data.stream;
 
-  								for ( var i = 1; i < stream.length; i++ ) {
+	  							var sortedStream = [];
+	  						 	var flag = false;
 
-  									postArray.push(stream[i][1]);
-  									clicks.push(stream[i][3]);
-  									likes.push(stream[i][4]);
-  									shares.push(stream[i][5]);
-  									comments.push(stream[i][6]);
+	  							for ( var i = 1; i < stream.length; i++ ) {
+	  								for ( var j = 0; j < sortedStream.length; j++ ) {
+	  									if ( stream[i][0] == sortedStream[j].id ) {
+	  										flag = true;
+	  										sortedStream[j].post ++;
+	  										sortedStream[j].click += stream[i][3];
+	  										sortedStream[j].like += stream[i][4];
+	  										sortedStream[j].share += stream[i][5];
+	  										sortedStream[j].comment += stream[i][6];
+	  									}
+	  								}
+
+	  								if ( !flag ) {
+	  									var tmpHash = {
+	  											id 		: stream[i][0],
+	  											name 	: stream[i][1],
+	  											post 	: 1,
+	  											click 	: stream[i][3],
+	  											like 	: stream[i][4],
+	  											share 	: stream[i][5],
+	  											comment : stream[i][6],
+	  										}
+	  										sortedStream.push( tmpHash );
+	  								}
+	  							}
+	  							//waiting for Swamy to validate 
+	  							console.log( "initial: ", stream);
+	  							console.log( "sorted: ", sortedStream);
+
+  								for ( var i = 1; i < sortedStream.length; i++ ) {
+
+  									postArray.push(sortedStream[i].name);
+  									posts.push(sortedStream[i].post);
+  									clicks.push(sortedStream[i].click);
+  									likes.push(sortedStream[i].like);
+  									shares.push(sortedStream[i].share);
+  									comments.push(sortedStream[i].comment);
 
   								}
 
   								for( var i = 0; i < postArray.length; i++ ) {
 
-  									// if ( posts[i] !== 0 ) {
+  									if ( posts[i] !== 0 ) {
+  										cRate.push( (clicks[i] / posts[i]).toFixed(2));
+  										ampRate.push( (shares[i] / posts[i]).toFixed(2));
+  										appRate.push( (likes[i] / posts[i]).toFixed(2));
+  										convRate.push( (comments[i] / posts[i]).toFixed(2));	
+  									}
+  									else {
   										cRate.push("N.A");
   										ampRate.push("N.A");
   										appRate.push("N.A");
   										convRate.push("N.A");	
-  										// cRate.push( (clicks[i] / posts[i]).toFixed(2));
-  										// ampRate.push( (shares[i] / posts[i]).toFixed(2));
-  										// appRate.push( (likes[i] / posts[i]).toFixed(2));
-  										// convRate.push( (comments[i] / posts[i]).toFixed(2));	
-  									// }
-  									// else {
-  									// 	cRate.push("N.A");
-  									// 	ampRate.push("N.A");
-  									// 	appRate.push("N.A");
-  									// 	convRate.push("N.A");	
-  									// }
+  									}
 
   								}
 
@@ -923,7 +1148,7 @@
 
   									t += "<tr>";
   									t += "<td>" + postArray[i] + "</td>";
-  									// t += "<td>" + addCommas( posts[i] ) + "</td>";
+  									t += "<td>" + addCommas( posts[i] ) + "</td>";
   									t += "<td>" + addCommas( clicks[i] ) + "</td>";
   									t += "<td>" + addCommas( likes[i] ) + "</td>";
   									t += "<td>" + addCommas( shares[i] ) + "</td>";
@@ -934,8 +1159,7 @@
   									t += "<td>" + addCommas( convRate[i] ) + "</td>";
   									t += "</tr>";
   								}
-
-  								$('#contentTable > tbody').html(t);
+  								$('#contentTable > .content-table-body').html(t);
 
   								if( $('#contentTableContainer').attr('data-custom-state') == "default" ) initiateTablesorter( "content" );
   								else $('#contentTable').trigger('update');
@@ -1018,9 +1242,8 @@
   									t += "<td>" + addCommas( convRate[i] ) + "</td>";
   									t += "</tr>"
   								}
-
-  								$('#userTable > tbody').html(t);
-
+  								
+  								$('#userTable > .user-table-body').html(t);
   								
   								if( $('#userTableContainer').attr('data-custom-state') == "default" ) initiateTablesorter( "user" );
   								else $('#userTable').trigger('update');
@@ -1088,7 +1311,7 @@
 
 		<section class="header-section">
 				
-			<div class="select-date-container"> 
+<!-- 			<div class="select-date-container"> 
 
 				<div class="select-date-column">
 					<span class="datepicker-label">Performance Overview:</span>
@@ -1110,7 +1333,37 @@
 					<span><img src="img/busy_gray_gray.gif"></span>
 				</div>
 
-			</div>	
+			</div> -->	
+
+			<div class="select-date-container"> 
+
+				<div class="select-date-column-left">
+					<span class="datepicker-label">Performance Overview:</span>
+				</div>
+
+				<div class="select-date-column-right">
+					<div class="input-wrapper">
+						<input id="from" type="text" class="datepicker input-child first-input-child">
+						<span class="input-child addon">-</span>				
+						<input id="to" type="text" class="datepicker input-child last-input-child">
+					</div>
+					<span class="percentage-compare-container">Compare to: Mon, September 01, 2013 - Mon, September 08, 2013</span>
+				</div>
+
+				<div class="select-date-column-right">
+					<div class="date-btn-wrapper">
+						<button id="ytdBtn" type="button" class="btn btn-default date-btn-custom date-btn-custom-left">Year to day</button>
+						<button id="mtdBtn" type="button" class="btn btn-default date-btn-custom">Month to day</button>
+						<button id="pmBtn" type="button" class="btn btn-default date-btn-custom date-btn-custom-right">Previous Month</button>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="subsequent-loading-img-container">
+				<span class="subsequent-loading-img"><img src="img/busy_gray_gray.gif"></span>
+			</div>
+
 
 		</section>
 
@@ -1322,9 +1575,14 @@
 				<ul class="tab-custom-ul">
 					<li id="campaignTableTab" class="table-tab tab-custom-li tab-custom-left">Campaigns</li
 					><li id="socialNetworkTableTab" class="table-tab tab-custom-li">Social Networks</li
-					><li id="contentTableTab" class="table-tab tab-custom-li">Top Content</li
-					><li id="userTableTab" class="table-tab tab-custom-li tab-custom-right">Top Users</li>
+					><li id="contentTableTab" class="table-tab tab-custom-li">Content</li
+					><li id="userTableTab" class="table-tab tab-custom-li tab-custom-right">Users</li>
 				</ul>
+
+				<div class="drilldown-restore-container hide">
+					<span id="filterMessage"></span>
+					<a id="restoreDrilldownBtn">Clear</a>
+				</div>
 			</div>
 
 			<div class="first-loading-img">
@@ -1423,7 +1681,7 @@
 
 				<div id="contentTableContainer" class="content-table-container hide" data-custom-state="default">
 					
-					<h5>Top Content Summary</h5>
+					<h5>Content Summary</h5>
 					
 					<div id="contentTableWrapper" class="wrapper">
 					
@@ -1432,7 +1690,7 @@
 								
 	  							<tr class="table-table-header"> 
 	  								<th colspan="1" rowspan="2" data-sorter="false">Title</th>
-	  								<!-- <th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th> -->
+	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
 	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
 	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
 	  							</tr>
@@ -1450,7 +1708,7 @@
 	  							</tr>
 							
 							</thead>
-							<tbody class="top-content-table-body table-table-body">
+							<tbody class="content-table-body table-table-body">
 								
 							</tbody>
 						</table>
@@ -1461,7 +1719,7 @@
 			
 				<div id="userTableContainer" class="user-table-container hide" data-custom-state="default">
 					
-					<h5>Top Users Summary</h5>
+					<h5>Users Summary</h5>
 					
 					<div id="userTableWrapper" class="wrapper">
 
@@ -1488,7 +1746,7 @@
 	  							</tr>
 							
 							</thead>
-							<tbody class="top-user-table-body table-table-body">
+							<tbody class="user-table-body table-table-body">
 	  							
 							</tbody>
 						</table>

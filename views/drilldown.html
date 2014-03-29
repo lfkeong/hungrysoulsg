@@ -236,6 +236,9 @@
 
 		  				$('#drilldownchart').highcharts({
 				            chart: {
+				            	style: {
+				            		cursor: 'crosshair'
+				            	},
 				            	defaultSeriesType: 'scatter',
 				            	events: {
 				            	 	selection: function( event ) {
@@ -327,19 +330,19 @@
 				            	xDateFormat: '%A, %b %d, %Y',
 				            	shared: true
 				            },
-				            // plotOptions: {
-				            // 	series: {
-				            // 		cursor: 'pointer',
-				            // 		allowPointSelect: true,
-				            // 		point: {
-				            // 			events: {
-				            // 				select: function() {
-				            // 					console.log(this);
-				            // 				}
-				            // 			}
-				            // 		}
-				            // 	}
-				            // },
+				            plotOptions: {
+				            	// series: {
+				            	// 	cursor: 'crosshair',
+				            	// 	allowPointSelect: true,
+				            	// 	point: {
+				            	// 		events: {
+				            	// 			select: function() {
+				            	// 				console.log(this);
+				            	// 			}
+				            	// 		}
+				            	// 	}
+				            	// }
+				            },
 				            exporting: {
 				            	enabled: false
 				            },
