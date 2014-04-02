@@ -30,7 +30,7 @@
 	  		$( function () {
 
 	  			var businessId = 53; //temporary fix
-	  			
+
 	  			//Tooltips Variables
 	  			var ttPosts 		= "Number of posts to social touchpoints",
 	  				ttUsers 		= "Number of users that have posted content during the specified timeframe",
@@ -73,31 +73,48 @@
 		  		init();	//Initialization
 
 				$(".btn-custom").click( function () {
+
+					$('.combinechart').hide();
+
+					var date = getDateFromDatepicker();
+
 					$('.btn-custom').removeClass('active');
 	  				$(this).addClass('active');
 	  				switch( $(this).attr('id') ) {
 	  					case 'dayBtn' :
 
-	  					console.log("call day");
-						//daily aggregation
+		  					if ( $('#dailyChart').attr("data-chart") == "outdated" ) {
+		  						$('#fade, #light').show();
+		  						fetchDailyStream( date, businessId );
+		  					}
+		  					$('#dailyChart').show();
 
 						break;
 						case 'weekBtn' :
 
-						console.log("call week");
-						//weekly aggregation
+		  					if ( $('#weeklyChart').attr("data-chart") == "outdated" ) {
+		  						$('#fade, #light').show();
+		  						fetchWeeklyStream( date, businessId );
+		  					}
+		  					$('#weeklyChart').show();
 
 						break;
 						case 'monthBtn' :
 
-						console.log("call month");
-						//monthly aggregation
+		  					if ( $('#monthlyChart').attr("data-chart") == "outdated" ) {
+		  						$('#fade, #light').show();
+		  						fetchMonthlyStream( date, businessId );
+		  					}
+		  					$('#monthlyChart').show();
 
 						break;
 					}
 				});
 
 				$(".date-btn-custom").click( function () {
+					
+					$('#fade, #light').show();
+
 					$('.date-btn-custom').removeClass('active');
 	  				$(this).addClass('active');
 	  				switch( $(this).attr('id') ) {
@@ -105,10 +122,7 @@
 
   						var currentDate = new Date (),
   							year = currentDate.getFullYear(),
-  							date = {
-  								s : new Date ( year, 0, 1),
-  								e : currentDate
-  							}
+  							date = [ new Date ( year, 0, 1), currentDate ];
 
   						setDateForDatepicker( date );
   						reloadData();
@@ -119,10 +133,7 @@
   						var currentDate = new Date (),
   							year = currentDate.getFullYear(),
   							month = currentDate.getMonth(),
-  							date = {
-  								s : new Date ( year, month, 1),
-  								e : currentDate
-  							}
+  							date = [ new Date ( year, month, 1), currentDate ];
 
   						setDateForDatepicker( date );
   						reloadData();
@@ -135,10 +146,7 @@
   							month = currentDate.getMonth(),
   							eom = new Date ( year, month );
   							
-  							date = {
-  								s : new Date ( year, month -1, 1),
-  								e : new Date ( eom.setDate(eom.getDate()-1) )
-  							}
+  							date = [ new Date ( year, month -1, 1), new Date ( eom.setDate(eom.getDate()-1) ) ];
 
   						setDateForDatepicker( date );
   						reloadData();
@@ -168,6 +176,7 @@
 				});
 
 				$("#restoreDrilldownBtn").click( function () {
+					$('#fade, #light').show();
 					reloadData();
 					$('.drilldown-restore-container').hide();
 				});
@@ -183,9 +192,9 @@
 		  				onSelect: function( selectedDate ) {
 		  					console.log(selectedDate);
 		  					$( "#to" ).datepicker( "option", "minDate", selectedDate );
-		  					$('.subsequent-loading-img').show();
+		  					$('#fade, #light').show();
 		  					$('.date-btn-custom').removeClass('active');
-		  					toggleTableState(); 
+
 		  					reloadData();
 		  				}
 		  			});
@@ -195,111 +204,113 @@
 		  				dateFormat: "D, MM dd, yy",
 		  				onSelect: function( selectedDate ) {
 		  					$( "#from" ).datepicker( "option", "maxDate", selectedDate );
-		  					$('.subsequent-loading-img').show();
+		  					$('#fade, #light').show();
 		  					$('.date-btn-custom').removeClass('active');
-		  					toggleTableState(); 
+
 		  					reloadData();
 		  				}
 		  			});
 
 					//Pre-setting default date - 30 days
-					var last30Days = new Date(), currentDay = new Date();
-					var info = {
-						s : new Date(last30Days.setDate(last30Days.getDate()-30)),
-						e : currentDay
-					}
+					var last30Days = new Date(), currentDay = new Date(),
+						info = [ new Date(last30Days.setDate(last30Days.getDate()-30)), currentDay ];
 
 		  			setDateForDatepicker( info );
 
-		  			$(".subsequent-loading-img, .drilldown-restore-container").hide();
+		  			$(".drilldown-restore-container").hide();
 
 		  			$("#summaryTab, #chartTab, #dayBtn, #campaignTableTab").addClass('active');
 
-			  		//Initialize Summary Screen, Charts/Graphs
+			  		//Initialize Summary Window, Charts/Graphs, Tables
 			  		fetchSummaryData( info, businessId );
-			  		fetchChartingData( info, businessId );
+			  		initiateChart( info, businessId ); 
+			  		initiateTables( info, businessId );
 
-	  				//Initialize Tables
-	  				constructCampaignTable( info, businessId );
-	  				constructContentTable( info, businessId );
-	  				constructUserTable( info, businessId );
-
-	  				//Initialize Tooltips
-	  				initiateTooltips();
+			  		//Initialize Tooltips
+	  				initiateTooltips();	
 
 	  			}
+
+	  			function initiateChart ( date, businessId ) {
+
+	  				if ( $('#dayBtn').hasClass("active") ) {
+	  					fetchDailyStream( date, businessId );
+	  					$('#dailyChart').show();
+	  				}
+	  				else if ( $('#weekBtn').hasClass("active") ) {
+	  					fetchWeeklyStream ( date, businessId );
+	  					$('#weeklyChart').show();
+	  				}
+	  				else {
+	  					fetchMonthlyStream ( date, businessId );
+	  					$('#monthlyChart').show();
+	  				}
+	  			}
+
+	  			function initiateTables ( date, businessId ) {
+
+	  				constructCampaignTable( date, businessId );
+	  				constructContentTable( date, businessId );
+	  				constructUserTable( date, businessId );
+
+	  				if ( $('#campaignTableTab').hasClass("active") ) {
+	  					$('#campaignTableContainer').show();
+	  				}
+	  				else if ( $('#socialNetworkTableTab').hasClass("active") ) {
+	  					$('#socialNetworkTableContainer').show();
+	  				}
+	  				else if ( $('#contentTableTab').hasClass("active") ) {
+	  					$('#contentTableContainer').show();
+	  				}
+	  				else {
+	  					$('#userTableContainer').show();
+	  				}
+	  			}
+
+	  			function reloadData () {
+
+					//chart display modes (refresh data)
+					$('#dailyChart, #weeklyChart, #monthlyChart').attr("data-chart", "outdated");
+
+					var date = getDateFromDatepicker();
+					fetchSummaryData( date, businessId );
+					initiateChart( date, businessId );
+					initiateTables( date, businessId );
+				}
 
 	  			/****************************** GENERAL FUNCTIONS ********************************/
 
 	  			function setDateForDatepicker ( date ) {
 
-	  				$( "#from" ).datepicker( "setDate", date.s );
-	  				$( "#to" ).datepicker( "setDate", date.e );
-
+	  				$( "#from" ).datepicker( "setDate", date[0] );
+	  				$( "#to" ).datepicker( "setDate", date[1] );
 	  			}
 
 	  			function getDateFromDatepicker () {
-
-	  				var date = {};
-	  				date = {
-	  					s : $("#from").datepicker("getDate"),
-	  					e : $("#to").datepicker("getDate")
-	  				}
-
-	  				return date;
+	  				return [ $("#from").datepicker("getDate"), $("#to").datepicker("getDate") ];
 	  			}
 
-	  			//Change date format
-	  			function parseDate ( type, date ) {
+	  			function processDate ( dates, initialForm, finalForm ) {
 
-	  				switch ( type ) {
+  					var parsedDate = [];
+  					
+  					for ( var i = 0; i < dates.length; i++ ) {
 
-	  					case "input" : //Convert input date to APIs' date format
+  						if ( initialForm == "default" ) {
+  							parsedDate[i] = $.datepicker.formatDate( finalForm, dates[i] );
+  						}
+  						else if ( finalForm == "default" ) {
+  							parsedDate[i] = $.datepicker.parseDate( initialForm, dates[i] );
+  						}
+  						else {
+  							var tmp = $.datepicker.parseDate( initialForm, dates[i] );
+  							parsedDate[i] = $.datepicker.formatDate( finalForm, tmp );
+  						}
 
-	  						var parsedDate = {};
-		  					parsedDate.s = $.datepicker.formatDate("yymmdd", date.s); //20140215, 20140216, 20140217 
-		  					parsedDate.e = $.datepicker.formatDate("yymmdd", date.e);
-		  					return parsedDate;
-
-	  					break; 
-
-	  					case "output" : //Convert output date to different form
-
-	  						var parsedDate = [];
-
-	  						for ( var i = 0; i < date.length; i++ ) {
-	  							var tmp = $.datepicker.parseDate("yymmdd",date[i]);
-	  							parsedDate[i] = $.datepicker.formatDate("@", tmp); //unix timestamp
-	  							parsedDate[i] = +parsedDate[i]; //converting number string to integer (highchart format)
-	  						}
-		  					return parsedDate;
-
-	  					break;
-
-	  					case "unixTS" :
-
-	  						var parsedDate = {};
-	  						parsedDate.s = $.datepicker.parseDate("yymmdd", date.s);
-	  						parsedDate.e = $.datepicker.parseDate("yymmdd", date.e);
-		  					parsedDate.s = $.datepicker.formatDate("@", parsedDate.s);
-		  					parsedDate.e = $.datepicker.formatDate("@", parsedDate.e);
-		  					parsedDate.s = +parsedDate.s;
-		  					parsedDate.e = +parsedDate.e;
-		  					return parsedDate;
-
-	  					break;
-
-	  					case "drilldown" :
-
-	  						var parsedDate = [];
-
-	  						for ( var i = 0; i < date.length; i++ ) {
-	  							parsedDate[i] = $.datepicker.parseDate("@",date[i]);
-	  						}
-	  						return parsedDate;
-
-	  					break;
-	  				}
+  						//converting number string to integer (highchart format)
+  						if ( finalForm == "@" ) parsedDate[i] = +parsedDate[i]; 
+  					}
+  					return parsedDate;
 	  			}
 
 	  			//Add commas for numbers that have more than 4 intergers
@@ -365,29 +376,42 @@
 					}
 				}
 
-	  			function toggleTableState () {
-					$('#campaignTableContainer, #socialNetworkTableContainer, #contentTableContainer, #userTableContainer')
-					.attr("data-custom-state", "update");
+				function selectPoint ( point1, point2, point3, point4, point5 ) {
+					point1.select( true, true );
+					point2.select( true, true );
+					point3.select( true, true );
+					point4.select( true, true );
+					point5.select( true, true );
+					return true;
 				}
 
-				function reloadData () {
+				function deSelectPoint ( point1, point2, point3, point4, point5 ) {
+					point1.select( false, true );
+					point2.select( false, true );
+					point3.select( false, true );
+					point4.select( false, true );
+					point5.select( false, true );
+					return false;
+				}
 
-					var date = getDateFromDatepicker();
-					fetchSummaryData( date, businessId );
-					fetchChartingData( date, businessId );
-					constructCampaignTable( date, businessId );
-					constructContentTable( date, businessId );
-					constructUserTable( date, businessId );
+				function findBiggest ( click, share, like, comment ) {
+					var tmpArray = [click, share, like, comment],
+					biggest = click;
+
+					for ( var i = 0; i < 4; i++ ) {
+						if ( tmpArray[i].y > biggest.y ) biggest = tmpArray[i];
+					}
+					return biggest;
 				}
 
 	  			/************************************* SUMMARY SCREEN FUNCTIONS ****************************/
 
 	  			function fetchSummaryData ( date, businessId ) {	//Constructing activity and impact summary window
 
-					var inputDate = parseDate( "input", date );
+					var inputDate = processDate( date, "default", "yymmdd" );
 
 	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetBusinessOverview?businessId=" + businessId + "&";
-	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+	  				url += "startDate=" + inputDate[0] + "&endDate=" + inputDate[1]
 
 	  				$.ajax({
 	  					url 	: url, 
@@ -398,6 +422,10 @@
 
 		  						//pass the same data to construct Social Network Table
 		  						constructSocialNetworkTable( response );
+
+		  						var compareDate = [ response.data.prevDate, response.data.prevEndDate ];
+		  						compareDate = processDate( compareDate, "yymmdd", "D, MM dd, yy" );
+		  						$('#percentageCompare').html("Compare to: <b>" + compareDate[0] + " - " + compareDate[1] + "</b>");
 
 	  							var previousStream, currentStream, previousTotalStream, currentTotalStream, previousUser, currentUser,
 	  								pPosts = [], pUsers = [], pClicks = [], pClickrate = [], pInteractions = []; //Sparkline-piechart variables declaration
@@ -530,7 +558,6 @@
 					$('#clickCount').text( curClick );
 					$('#clickRateCount').text( curClickRate );
 					$('#interactionCount').text( curTotalInteraction );
-
 	  			}
 
 	  			function getPercentageDifference ( current, previous ) {
@@ -579,7 +606,7 @@
 	  					type 	: 'pie',
 	  					width 	: '50px',
 	  					height	: '25px',
-	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
+	  					sliceColors: ['#1b9e77', '#d95f02', '#7570b3'],
 	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val1[0]
@@ -602,7 +629,7 @@
 	  					type 	: 'pie',
 	  					width 	: '50px',
 	  					height	: '25px',
-	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
+	  					sliceColors: ['#1b9e77', '#d95f02', '#7570b3'],
 	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val3[0]
@@ -613,7 +640,7 @@
 	  					type 	: 'pie',
 	  					width 	: '50px',
 	  					height	: '25px',
-	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
+	  					sliceColors: ['#1b9e77', '#d95f02', '#7570b3'],
 	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val4[0]
@@ -624,48 +651,43 @@
 	  					type 	: 'pie',
 	  					width 	: '50px',
 	  					height	: '25px',
-	  					sliceColors: ['#377eb8', '#e41a1c', '#4daf4a'],
+	  					sliceColors: ['#1b9e77', '#d95f02', '#7570b3'],
 	  					tooltipFormat: '{{offset:slice}}: {{percent.1}}%',
 	  					tooltipValueLookups: {
 	  						'slice': val5[0]
 	  					}
 	  				});
-
 	  			}
 
 	  			/************************************ CHARTING FUNCTIONS ***********************************/
 
-	  			function fetchChartingData ( date, businessId ) {	//Charting daily line chart and column chart
+	  			function fetchDailyStream ( date, businessId ) {	//Charting daily line chart and column chart
 
-	  				var inputDate = parseDate( "input", date );
+	  				var inputDate = processDate( date, "default", "yymmdd" );
 	  				
 	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetDailyStream?businessId=" + businessId + "&";
-	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+	  				url += "startDate=" + inputDate[0] + "&endDate=" + inputDate[1]
 
 	  				$.ajax({
 	  					url 	: url, 
 	  					type 	: "GET",
 	  					success : function ( response ) {
 	  						if ( response.status ) {
-	  							// var dates = [], clicks = [], shares = [], likes = [], comments = [], posts = [];
-	  							var clicks = [], shares = [], likes = [], comments = [], posts = [];
 
-	  							for ( var i = 1; i < response.data.stream.length; i++ ) {
-	  								var dailyStream = response.data.stream;
+	  							var clicks = [], shares = [], likes = [], comments = [], posts = [],
+	  								dailyStream = response.data.stream;
 
-	  								// dates.push( dailyStream[i][0] );
+	  							for ( var i = 1; i < dailyStream.length; i++ ) {
+
 	  								posts.push( dailyStream[i][1] );
 	  								clicks.push( dailyStream[i][2] );
 	  								likes.push( dailyStream[i][3] );
 	  								shares.push( dailyStream[i][4] );
 	  								comments.push( dailyStream[i][5] );
 	  							}
-	  							
-	  							// dates = parseDate( "output", dates );
-	  							inputDate = parseDate( "unixTS", inputDate );
 
-	  							// constructCombineChart( dates, posts, clicks, shares, likes,comments);
-	  							constructCombineChart( inputDate, posts, clicks, shares, likes,comments);
+	  							inputDate = processDate( inputDate, "yymmdd", "@" );
+	  							plotDayChart( inputDate, posts, clicks, shares, likes,comments);
   							}
   							else {
 	  							//return status = false
@@ -680,45 +702,101 @@
  	  				});
 	  			}
 
-	  			// HighChart default color --> http://jsfiddle.net/JfVHr/1/
-	  			function constructCombineChart ( dates, posts, clicks, shares, likes, comments ) {
+	  			function fetchWeeklyStream ( date, businessId ) {
 
-	  				 $('#combinechart').highcharts({
-			            chart: {
+	  				var inputDate = processDate( date, "default", "yymmdd" );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetWeeklyStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate[0] + "&endDate=" + inputDate[1]
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							var dates = [], clicks = [], shares = [], likes = [], comments = [], posts = [],
+	  								weeklyStream = response.data.stream;
+
+	  							for ( var i = 1; i < weeklyStream.length; i++ ) {
+	  								
+	  								var tmp = [ weeklyStream[i][0], weeklyStream[i][1] ];
+
+	  								dates.push( tmp );
+	  								posts.push( weeklyStream[i][3] );
+	  								clicks.push( weeklyStream[i][4] );
+	  								likes.push( weeklyStream[i][5] );
+	  								shares.push( weeklyStream[i][6] );
+	  								comments.push( weeklyStream[i][7] );								
+	  							}
+
+	  							plotWeekChart( dates, posts, clicks, shares, likes, comments);
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetWeeklyStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetWeeklyStream API failure, server error");
+ 	  					}
+ 	  				});
+	  			}
+
+	  			function fetchMonthlyStream ( date, businessId ) {
+
+	  				var inputDate = processDate( date, "default", "yymmdd" );
+
+	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetMonthlyStream?businessId=" + businessId + "&";
+	  				url += "startDate=" + inputDate[0] + "&endDate=" + inputDate[1]
+
+	  				$.ajax({
+	  					url 	: url, 
+	  					type 	: "GET",
+	  					success : function ( response ) {
+	  						if ( response.status ) {
+	  							var dates = [], clicks = [], shares = [], likes = [], comments = [], posts = [],
+	  								monthlyStream = response.data.stream;
+
+	  							for ( var i = 1; i < monthlyStream.length; i++ ) {
+
+	  								var tmp = [ monthlyStream[i][0], monthlyStream[i][1] ];
+	  								
+	  								dates.push( tmp );
+	  								posts.push( monthlyStream[i][3] );
+	  								clicks.push( monthlyStream[i][4] );
+	  								likes.push( monthlyStream[i][5] );
+	  								shares.push( monthlyStream[i][6] );
+	  								comments.push( monthlyStream[i][7] );								
+	  							}
+	  							
+	  							plotMonthChart( dates, posts, clicks, shares, likes, comments);
+  							}
+  							else {
+	  							//return status = false
+	  							console.log(url);
+	  							console.log("GetMonthlyStream API failture, return status false");
+	  						}
+	  					},
+	  					error 	: function () {
+ 	  						//server error
+ 	  						console.log("GetMonthlyStream API failure, server error");
+ 	  					}
+ 	  				});
+	  			}
+
+	  			function plotDayChart ( dates, posts, clicks, shares, likes, comments ) {
+
+	  				$('#dailyChart').highcharts({
+	  					chart: {
+	  						height: 300,
 			            	style: {
-				            		cursor: 'crosshair'
+			            		cursor: 'crosshair'
 			            	},
 			            	defaultSeriesType: 'scatter',
 			            	events: {
 			            		selection: function( event ) {
-
-			            			function selectPoint ( point1, point2, point3, point4, point5 ) {
-			            				point1.select( true, true );
-			            				point2.select( true, true );
-			            				point3.select( true, true );
-			            				point4.select( true, true );
-			            				point5.select( true, true );
-			            				return true;
-			            			}
-
-			            			function deSelectPoint ( point1, point2, point3, point4, point5 ) {
-			            				point1.select( false, true );
-			            				point2.select( false, true );
-			            				point3.select( false, true );
-			            				point4.select( false, true );
-			            				point5.select( false, true );
-			            				return false;
-			            			}
-
-			            			function findBiggest ( click, share, like, comment ) {
-			            				var tmpArray = [click, share, like, comment],
-			            					biggest = click;
-
-			            				for ( var i = 0; i < 4; i++ ) {
-			            					if ( tmpArray[i].y > biggest.y ) biggest = tmpArray[i];
-			            				}
-			            				return biggest;
-			            			}
 
 			            			event.preventDefault();
 
@@ -752,7 +830,7 @@
 
 		            	 				}
 		            	 			}
-		            	 			var chart = $('#combinechart').highcharts(),
+		            	 			var chart = $('#dailyChart').highcharts(),
 			            	 			selectedPoints = chart.getSelectedPoints(),
 			            	 			dateRange = [];
 			            	 			console.log(selectedPoints);
@@ -813,7 +891,7 @@
 			            },
 			            series: [{
 			            	pointInterval: 24 * 3600 * 1000,
-			            	pointStart: dates.s,
+			            	pointStart: dates[0],
 			                type: 'column',
 			                name: 'Posts',
 			                yAxis: 1,
@@ -821,7 +899,131 @@
 			                color: '#bdc3c7'
 			            }, {
 			            	pointInterval: 24 * 3600 * 1000,
-			            	pointStart: dates.s,
+			            	pointStart: dates[0],
+			                type: 'line',
+			                name: 'Clicks',
+			                data: clicks,
+			                color: '#3498db'
+			            }, {
+			            	pointInterval: 24 * 3600 * 1000,
+			            	pointStart: dates[0],
+			                type: 'line',
+			                name: 'Shares',
+			                data: shares,
+			                color: '#f1c40f'
+			            }, {
+			            	pointInterval: 24 * 3600 * 1000,
+			            	pointStart: dates[0],
+			                type: 'line',
+			                name: 'Likes',
+			                data: likes,
+			                color: '#e74c3c'
+			            }, {
+			            	pointInterval: 24 * 3600 * 1000,
+			            	pointStart: dates[0],
+			                type: 'line',
+			                name: 'Comments',
+			                data: comments,
+			                color: '#34495e'
+			            }]
+	  				});
+
+	  				$('#dailyChart').attr("data-chart", "updated");
+	  				$("#fade, #light").hide();
+	  			}
+
+	  			function plotWeekChart ( dates, posts, clicks, shares, likes, comments ) {
+	  				
+	  				for ( var i = 0; i < dates.length; i++ ) {
+	  					dates[i] = processDate( dates[i], "yymmdd", "@" );
+	  				}
+
+	  				for ( var i = 0; i < posts.length; i++ ) {
+	  					posts[i] 	= [ dates[i][0] + "-" + dates[i][1], posts[i] ];
+	  					clicks[i] 	= [ dates[i][0] + "-" + dates[i][1], clicks[i] ];
+	  					shares[i] 	= [ dates[i][0] + "-" + dates[i][1], shares[i] ];
+	  					likes[i] 	= [ dates[i][0] + "-" + dates[i][1], likes[i] ];
+	  					comments[i] = [ dates[i][0] + "-" + dates[i][1], comments[i] ];
+	  				}
+
+	  				$('#weeklyChart').highcharts({
+	  					chart: {
+	  						height: 300,
+			            	style: {
+			            		cursor: 'crosshair'
+			            	},
+			            },
+			            title: {
+			                text: null
+			            },
+			            xAxis: {
+							type: "datetime",
+							labels: {
+								formatter: function () {
+									var tmp = $.datepicker.parseDate("@", this.value);
+									return 	$.datepicker.formatDate("dd M", tmp);
+								}
+							}	                
+			            },
+			            yAxis: [{ // Primary yAxis
+			            			min: 0,
+			            			gridLineColor: 'rgba(0,0,0,.05)',
+					                title: {
+					                    text: 'Interactions',
+					                    style: {
+					                        color: '#89A54E'
+					                    }
+					                },
+					                label: {
+					                	style: {
+					                		color: '#30cd72'
+					                	}
+					                }
+			            		}, { // Secondary yAxis
+			            			min: 0,
+					                title: {
+					                    text: 'Posts',
+					                    style: {
+					                        color: '#4572A7'
+					                    }
+					                },
+					                opposite: true,
+					                gridLineColor: 'rgba(0,0,0,.05)'
+					            }],
+			            tooltip: {
+			            	formatter: function() {
+
+			            		var name = this.points[0].key, tmp = [];
+			            		name = name.split("-");
+
+			            		for ( var i = 0 ; i < 2; i++ ) {
+			            			tmp[i] = $.datepicker.parseDate("@",name[i]);
+			            			tmp[i] = $.datepicker.formatDate("M d, yy", tmp[i]);
+			            		}
+
+			            		var	result = '<span style="font-size: 10px">' + tmp[0] + " - " + tmp[1] + '</span>'
+			            		$.each(this.points, function(i, point) {
+			            			result += '<br/><span style="color:' + point.series.color + '">'+ point.series.name + '</span>: <b>' + point.y +'</b>';
+			            		});
+
+			            		return result;
+			            	},
+			            	shared: true
+			            },
+			            exporting: {
+			            	enabled: false
+			            },
+			            series: [{
+			            	pointInterval: 24 * 3600 * 1000 * 7,
+			            	pointStart: dates[0][0],
+			                type: 'column',
+			                name: 'Posts',
+			                yAxis: 1,
+			                data: posts,
+			                color: '#bdc3c7'
+			            }, {
+			            	pointInterval: 24 * 3600 * 1000 * 7,
+			            	pointStart: dates[0][0],
 			                type: 'line',
 			                name: 'Clicks',
 			                data: clicks,
@@ -832,48 +1034,162 @@
 			                // 	fillColor: 'white'
 			                // }
 			            }, {
-			            	pointInterval: 24 * 3600 * 1000,
-			            	pointStart: dates.s,
+			            	pointInterval: 24 * 3600 * 1000 * 7,
+			            	pointStart: dates[0][0],
 			                type: 'line',
 			                name: 'Shares',
 			                data: shares,
-			                color: '#f1c40f',
+			                color: '#f1c40f'
 			            }, {
-			            	pointInterval: 24 * 3600 * 1000,
-			            	pointStart: dates.s,
+			            	pointInterval: 24 * 3600 * 1000 * 7,
+			            	pointStart: dates[0][0],
 			                type: 'line',
 			                name: 'Likes',
 			                data: likes,
-			                color: '#e74c3c',
+			                color: '#e74c3c'
 			            }, {
-			            	pointInterval: 24 * 3600 * 1000,
-			            	pointStart: dates.s,
+			            	pointInterval: 24 * 3600 * 1000 * 7,
+			            	pointStart: dates[0][0],
 			                type: 'line',
 			                name: 'Comments',
 			                data: comments,
 			                color: '#34495e'
 			            }]
-			        });
-					
-					$(".subsequent-loading-img").hide();
-					$('.first-loading-img').hide() //Campaign table is default table, hide loading img
+	  				});
 
+	  				$('#weeklyChart').attr("data-chart", "updated");
+	  				$("#fade, #light").hide();
+	  			}
+
+	  			function plotMonthChart ( dates, posts, clicks, shares, likes, comments ) {
+
+	  				for ( var i = 0; i < dates.length; i++ ) {
+	  					dates[i] = processDate( dates[i], "yymmdd", "@" );
+	  				}
+
+	  				for ( var i = 0; i < posts.length; i++ ) {
+	  					posts[i] 	= [ dates[i][0], posts[i] ];
+	  					clicks[i] 	= [ dates[i][0], clicks[i] ];
+	  					shares[i] 	= [ dates[i][0], shares[i] ];
+	  					likes[i] 	= [ dates[i][0], likes[i] ];
+	  					comments[i] = [ dates[i][0], comments[i] ];
+	  				}
+	  				console.log(dates);
+	  				$('#monthlyChart').highcharts({
+	  					chart: {
+	  						height: 300,
+			            	style: {
+			            		cursor: 'crosshair'
+			            	},
+			            },
+			            title: {
+			                text: null
+			            },
+			            xAxis: {
+							type: "datetime",
+							labels: {
+								formatter: function () {
+									console.log("label", this);
+									var tmp = $.datepicker.parseDate("@", this.value);
+									return 	$.datepicker.formatDate("MM", tmp);
+								}
+							}	                
+			            },
+			            yAxis: [{ // Primary yAxis
+			            			min: 0,
+			            			gridLineColor: 'rgba(0,0,0,.05)',
+					                title: {
+					                    text: 'Interactions',
+					                    style: {
+					                        color: '#89A54E'
+					                    }
+					                },
+					                label: {
+					                	style: {
+					                		color: '#30cd72'
+					                	}
+					                }
+			            		}, { // Secondary yAxis
+			            			min: 0,
+					                title: {
+					                    text: 'Posts',
+					                    style: {
+					                        color: '#4572A7'
+					                    }
+					                },
+					                opposite: true,
+					                gridLineColor: 'rgba(0,0,0,.05)'
+					            }],
+			            tooltip: {
+			            	formatter: function() {
+
+			            		var firstDay = new Date( this.x ),
+			            			lastDay = new Date ( tmp.getFullYear(), tmp.getMonth() + 1, 0 );
+
+		            			firstDay =  $.datepicker.formatDate("M d, yy", firstDay);
+		            			lastDay = $.datepicker.formatDate("M d, yy", lastDay);
+			          
+			            		var	result = '<span style="font-size: 10px">' + firstDay + " - " + lastDay + '</span>'
+			            		$.each(this.points, function(i, point) {
+			            			result += '<br/><span style="color:' + point.series.color + '">'+ point.series.name + '</span>: <b>' + point.y +'</b>';
+			            		});
+
+			            		return result;
+			            	},
+			            	shared: true
+			            },
+			            exporting: {
+			            	enabled: false
+			            },
+			            series: [{
+			                type: 'column',
+			                name: 'Posts',
+			                yAxis: 1,
+			                data: posts,
+			                color: '#bdc3c7'
+			            }, {
+			                type: 'line',
+			                name: 'Clicks',
+			                data: clicks,
+			                color: '#3498db'
+			                // marker: {
+			                // 	lineWidth: 2,
+			                // 	lineColor: Highcharts.getOptions().colors[3],
+			                // 	fillColor: 'white'
+			                // }
+			            }, {
+			                type: 'line',
+			                name: 'Shares',
+			                data: shares,
+			                color: '#f1c40f'
+			            }, {
+			                type: 'line',
+			                name: 'Likes',
+			                data: likes,
+			                color: '#e74c3c'
+			            }, {
+			                type: 'line',
+			                name: 'Comments',
+			                data: comments,
+			                color: '#34495e'
+			            }]
+	  				});
+
+	  				$('#monthlyChart').attr("data-chart", "updated");
+	  				$("#fade, #light").hide();
 	  			}
 
 	  			function constructDrilldownTable ( dateRange ) {
-	  				console.log (dateRange);
-	  				var tmp = parseDate( "drilldown", dateRange ),
-	  					date = {
-	  						s : tmp[0],
-	  						e : tmp[tmp.length -1]
-	  					}
+
+	  				var tmp = processDate( dateRange, "@", "default" ),
+	  					date = [ tmp[0], tmp[tmp.length -1] ]
 
 	  					console.log(date);
 
-	  				var inputDate = parseDate( "input", date );
+	  				var inputDate = processDate( date, "default", "yymmdd" );
 
 	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetBusinessOverview?businessId=" + businessId + "&";
-	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+	  				url += "startDate=" + inputDate[0] + "&endDate=" + inputDate[1]
 
 	  				$.ajax({
 	  					url 	: url, 
@@ -897,8 +1213,8 @@
 
 	  				var message = "";
 	  				message += "Date range: "
-					message += "<b>" + $.datepicker.formatDate("D, MM dd", date.s);
-	  				message += " to " + $.datepicker.formatDate("D, MM dd", date.e) + " - </b>";
+					message += "<b>" + $.datepicker.formatDate("D, MM dd", date[0]);
+	  				message += " to " + $.datepicker.formatDate("D, MM dd", date[1]) + " - </b>";
 	  				$('#filterMessage').html( message );
 	  				$('.drilldown-restore-container').show();
 	  			}
@@ -907,10 +1223,10 @@
 
 	  			function constructCampaignTable ( date, businessId ) {
 
-	  				var inputDate = parseDate( "input", date );
+	  				var inputDate = processDate( date, "default", "yymmdd" );
 
 	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetCampaignStream?businessId=" + businessId + "&";
-	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+	  				url += "startDate=" + inputDate[0] + "&endDate=" + inputDate[1]
 
 	  				$.ajax({
 	  					url 	: url, 
@@ -925,7 +1241,7 @@
 
   								for ( var i = 1; i < stream.length; i++ ) {
 
-  									destination.push("N.A");
+  									destination.push("SMC");
   									campaignArray.push(stream[i][1]);
   									posts.push( stream[i][2] );
   									clicks.push( stream[i][3] );
@@ -972,13 +1288,8 @@
   								}
   								$('#campaignTable > .campaign-table-body').html(t);
 
-  								if( $('#campaignTableContainer').attr('data-custom-state') == "default" ) {
-  									$('#campaignTableContainer').show();
-  									initiateTablesorter( "campaign" );
-  								}
-  								else {
-  									$('#campaignTable').trigger('update');
-  								}
+  								if( $('#campaignTableContainer').attr('data-custom-state') == "default" ) initiateTablesorter( "campaign" );
+  								else $('#campaignTable').trigger('update');
 
   							}
   							else {
@@ -1061,15 +1372,14 @@
 
 	  				if( $('#socialNetworkTableContainer').attr('data-custom-state') == "default" ) initiateTablesorter( "socialNetwork" );
 	  				else $('#socialNetworkTable').trigger('update');
-
 	  			}
 
 	  			function constructContentTable ( date, businessId ) {
 
-	  				var inputDate = parseDate( "input", date );
+	  				var inputDate = processDate( date, "default", "yymmdd" );
 
 	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetPostStream?businessId=" + businessId + "&";
-	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+	  				url += "startDate=" + inputDate[0] + "&endDate=" + inputDate[1]
 
 	  				$.ajax({
 	  					url 	: url, 
@@ -1111,8 +1421,8 @@
 	  								}
 	  							}
 	  							//waiting for Swamy to validate 
-	  							console.log( "initial: ", stream);
-	  							console.log( "sorted: ", sortedStream);
+	  							// console.log( "initial: ", stream);
+	  							// console.log( "sorted: ", sortedStream);
 
   								for ( var i = 1; i < sortedStream.length; i++ ) {
 
@@ -1180,10 +1490,10 @@
 
 	  			function constructUserTable ( date, businessId ) {
 
-	  				var inputDate = parseDate( "input", date );
+	  				var inputDate = processDate( date, "default", "yymmdd" );
 
 	  				var url = "http://betabiz.newzsocial.com/nscon/data/GetUserStream?businessId=" + businessId + "&";
-	  				url += "startDate=" + inputDate.s + "&endDate=" + inputDate.e
+	  				url += "startDate=" + inputDate[0] + "&endDate=" + inputDate[1]
 
 	  				$.ajax({
 	  					url 	: url, 
@@ -1275,23 +1585,26 @@
 						// }
 					}
 
-
 					switch ( type ) {
 
 						case "campaign" :
 							// option.widgetOptions.stickyHeaders_attachTo = $('#campaignTableWrapper');
+							$('#campaignTableContainer').attr("data-custom-state", "update");
 							table = "#campaignTable";
 						break;
 						case "socialNetwork" :
 							// option.widgetOptions.stickyHeaders_attachTo = $('#socialNetworkTableWrapper');
+							$('#socialNetworkTableContainer').attr("data-custom-state", "update");
 							table = "#socialNetworkTable";
 						break;
 						case "content" :
 							// option.widgetOptions.stickyHeaders_attachTo = $('#contentTableWrapper');
+							$('#contentTableContainer').attr("data-custom-state", "update");
 							table = "#contentTable";
 						break;
 						case "user":
 							// option.widgetOptions.stickyHeaders_attachTo = $('#userTableWrapper');
+							$('#userTableContainer').attr("data-custom-state", "update");
 							table = "#userTable";
 						break;
 					}
@@ -1307,33 +1620,17 @@
 	
 	<body>
 
+		<div id="fade" class="black_overlay"></div>
 
+		<div id="light" class="white_content">
+			<span class="transition-loading">Loading...</span>
+			<br><br>
+			<div class="loading-img-container">
+				<img src="img/busy_gray_gray.gif">
+			</div>
+		</div>
 
 		<section class="header-section">
-				
-<!-- 			<div class="select-date-container"> 
-
-				<div class="select-date-column">
-					<span class="datepicker-label">Performance Overview:</span>
-				</div>
-
-				<div class="select-date-column">
-					<input id="from" type="text" class="datepicker">
-				</div>
-
-				<div class="select-date-column">
-					<span class="datepicker-label">to</span>
-				</div>
-
-				<div class="select-date-column">
-					<input id="to" type="text" class="datepicker">
-				</div>
-
-				<div class="select-date-column subsequent-loading-img">
-					<span><img src="img/busy_gray_gray.gif"></span>
-				</div>
-
-			</div> -->	
 
 			<div class="select-date-container"> 
 
@@ -1347,23 +1644,18 @@
 						<span class="input-child addon">-</span>				
 						<input id="to" type="text" class="datepicker input-child last-input-child">
 					</div>
-					<span class="percentage-compare-container">Compare to: Mon, September 01, 2013 - Mon, September 08, 2013</span>
+					<span id="percentageCompare" class="percentage-compare-container"></span>
 				</div>
 
 				<div class="select-date-column-right">
 					<div class="date-btn-wrapper">
-						<button id="ytdBtn" type="button" class="btn btn-default date-btn-custom date-btn-custom-left">Year to day</button>
-						<button id="mtdBtn" type="button" class="btn btn-default date-btn-custom">Month to day</button>
+						<button id="ytdBtn" type="button" class="btn btn-default date-btn-custom date-btn-custom-left">Year to date</button>
+						<button id="mtdBtn" type="button" class="btn btn-default date-btn-custom">Month to date</button>
 						<button id="pmBtn" type="button" class="btn btn-default date-btn-custom date-btn-custom-right">Previous Month</button>
 					</div>
 				</div>
 
 			</div>
-
-			<div class="subsequent-loading-img-container">
-				<span class="subsequent-loading-img"><img src="img/busy_gray_gray.gif"></span>
-			</div>
-
 
 		</section>
 
@@ -1550,10 +1842,6 @@
 					</li>
 				</ul>
 			</div>
-				
-			<div class="first-loading-img">
-				<span><img src="img/busy_gray_gray.gif"></span>
-			</div>
 
 			<div class="charts-container">
 
@@ -1563,7 +1851,9 @@
 					<button id="monthBtn" type="button" class="btn btn-default btn-custom btn-custom-btm">Month</button>
 				</div>
 				
-				<div id="combinechart" class="combinechart"></div>
+				<div id="dailyChart" class="combinechart hide" data-chart="outdated"></div>
+				<div id="weeklyChart" class="combinechart hide" data-chart="outdated"></div>
+				<div id="monthlyChart" class="combinechart hide" data-chart="outdated"></div>
 
 			</div>
 
@@ -1583,10 +1873,6 @@
 					<span id="filterMessage"></span>
 					<a id="restoreDrilldownBtn">Clear</a>
 				</div>
-			</div>
-
-			<div class="first-loading-img">
-				<span><img src="img/busy_gray_gray.gif"></span>
 			</div>
 
 			<div class="table-container">
