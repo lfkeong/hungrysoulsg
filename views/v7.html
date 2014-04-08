@@ -383,10 +383,6 @@
 					}
 				}
 
-				function transition () {
-					
-				}
-
 				function selectPoint ( point1, point2, point3, point4, point5 ) {
 					point1.select( true, true );
 					point2.select( true, true );
@@ -811,7 +807,7 @@
 			            		selection: function( event ) {
 
 			            			event.preventDefault();
-			            			console.log(event);
+
 			            			for ( var i = 0; i < this.series[0].data.length; i++ ) {
 
 			            	 			var point1 = this.series[0].data[i], 	//post column series
@@ -896,11 +892,6 @@
 					                opposite: true,
 					                gridLineColor: 'rgba(0,0,0,.05)'
 					            }],
-					    plotOptions : {
-					    	area : {
-					    		cursor: "crosshair"
-					    	}
-					    },
 			            tooltip: {
 			            	xDateFormat: '%A, %b %d, %Y',
 			            	shared: true
@@ -2179,7 +2170,7 @@
 								
 								<tr class="table-table-header"> 
 	  								<th colspan="1" rowspan="2" data-sorter="false">Campaign</th>
-	  								<th class='' colspan="1" rowspan="2" data-tt='destination' data-sorter="false">Destination</th>
+	  								<th colspan="1" rowspan="2" data-tt='destination' data-sorter="false">Destination</th>
 	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
 	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
 	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
