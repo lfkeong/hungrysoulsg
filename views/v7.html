@@ -29,7 +29,7 @@
 
 	  		$( function () {
 
-	  			var businessId = 53; //temporary fix
+	  			var businessId = 1; //temporary fix
 
 	  			//Tooltips Variables
 	  			var ttPosts 		= "Number of posts to social touchpoints",
@@ -71,6 +71,33 @@
 				});
 
 		  		init();	//Initialization
+
+		  		$("#socialNetworkDestinationFilter").change( function () {
+
+		  			var t = "";
+		  			t += "<tr id='noDataMessage' style='height:125px;'>";
+		  			t += "<td colspan='11' class='no-data-message'>";
+		  			t += "No Data Available";
+		  			t += "</td>";
+		  			t += "</tr>";
+		  			$('#campaignTable > .campaign-table-body').append(t);
+		  			$('#noDataMessage').hide();
+
+		  			switch( $('#socialNetworkDestinationFilter').val() ) {
+		  				case "1":
+		  					console.log("show all");
+		  				break;
+		  				case "2":
+		  					console.log("show FB");
+		  				break;
+		  				case "3":
+		  					console.log("show TW");
+		  				break;
+		  				case "4":
+		  					console.log("show LK");
+		  				break;
+		  			}
+		  		});
 
 				$(".btn-custom").click( function () {
 
@@ -1353,6 +1380,8 @@
 	  					type 	: "GET",
 	  					success : function ( response ) {
 	  						if ( response.status ) {
+
+	  							$('#socialNetworkDestinationFilter').val("1"); //by default
 	  							var stream, campaignArray = [], destination = [],
 	  								posts = [], clicks = [], likes = [], shares = [], comments = [],
 	  								cRate = [], ampRate = [], appRate = [], convRate = [];
@@ -1801,14 +1830,20 @@
 		  							userId = [], userName = [], campaignId = [];
 
 		  						stream = response.data.stream;
+		  						stream.sort( function ( a, b ) {
+		  							var first = new Date( a[13] ).getTime(),
+		  								second = new Date( b[13] ).getTime();
+
+		  							if ( first > second ) return 1;
+		  							else if ( first == second ) return	0;
+		  							else return -1;
+		  						});
 
 		  						for ( var i = 1; i < stream.length; i++ ) {
 
-		  							var	regexTime = /\d+[:]\d+[:]\d+/,
-		  								t = regexTime.exec( stream[i][13] ),
-		  								d = [ new Date( stream[i][13]) ];
+		  							var d = [ new Date(stream[i][13]) ], 
+		  								t = [ d[0].getHours(), d[0].getMinutes() ];
 
-		  								t = t[0].split(":");
 		  								d = processDate( d, "default", "D, MM dd, yy at " );
 
 		  							postId.push( stream[i][0] );
@@ -2154,7 +2189,7 @@
 					<div class="social-network-select-container">
 						<span class="social-network-filter-label"> Social Network:</span>
 
-						<select id="businessSelector" class="social-network-selector">
+						<select id="socialNetworkDestinationFilter" class="social-network-selector">
 							<option value="1">All</option>
 							<option value="2">Facebook</option>
 							<option value="3">Twitter</option>
