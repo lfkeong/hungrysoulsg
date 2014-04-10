@@ -607,7 +607,7 @@
 	  						if ( value > 100 ) value = value.toFixed(0);
 	  						else value = value.toFixed(2);
 	  						
-	  						html = '<span class="percentage up"><i class="fa fa-arrow-up">' + value + '%</i></span>';
+	  						html = '<span class="percentage up"><i class="fa fa-arrow-up"> ' + value + '%</i></span>';
 	  					}
 	  					else html = '<span class="percentage">--</span>'; //previously data is "zero"
 
@@ -620,9 +620,9 @@
 	  						if ( value > 100 ) value = value.toFixed(0);
 	  						else value = value.toFixed(2);
 
-	  						html = '<span class="percentage down"><i class="fa fa-arrow-down">' + value + '%</i></span>';
+	  						html = '<span class="percentage down"><i class="fa fa-arrow-down"> ' + value + '%</i></span>';
 	  					}
-	  					else html = '<span class="percentage down"><i class="fa fa-arrow-down">100%</i></span>'; //current data is "zero"
+	  					else html = '<span class="percentage down"><i class="fa fa-arrow-down"> 100%</i></span>'; //current data is "zero"
 
 	  				}
 	  				else {
