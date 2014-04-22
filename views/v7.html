@@ -178,7 +178,7 @@
   							eom = new Date ( year, month );
   							
   							date = [ new Date ( year, month -1, 1), new Date ( eom.setDate(eom.getDate()-1) ) ];
-
+  						console.log("here", date);
   						setDateForDatepicker( date );
   						reloadData();
 
@@ -222,7 +222,6 @@
 		  				maxDate: 0,
 		  				dateFormat: "D, MM dd, yy",
 		  				onSelect: function( selectedDate ) {
-		  					console.log(selectedDate);
 		  					$( "#to" ).datepicker( "option", "minDate", selectedDate );
 		  					// $('#fade, #light').show();
 		  					$('#reloadLoadingImg').show();
@@ -317,7 +316,11 @@
 	  			function setDateForDatepicker ( date ) {
 
 	  				$( "#from" ).datepicker( "setDate", date[0] );
+	  				$( "#to" ).datepicker( "option", "minDate", date[0] );
+
 	  				$( "#to" ).datepicker( "setDate", date[1] );
+	  				$( "#from" ).datepicker( "option", "maxDate", date[1] );
+
 	  			}
 
 	  			function getDateFromDatepicker () {
@@ -921,6 +924,19 @@
 					            }],
 			            tooltip: {
 			            	xDateFormat: '%A, %b %d, %Y',
+			            	//India time and PST time temporary fix
+			            	formatter: function() {
+
+			            		var name = this.points[0].key, tmp ;
+			            		tmp = $.datepicker.parseDate("@",name);
+			            		tmp = $.datepicker.formatDate("DD, M d, yy", tmp);
+
+			            		var     result = '<span style="font-size: 10px">' + tmp +'</span>'
+			            		$.each(this.points, function(i, point) {
+			            			result += '<br/><span style="color:' + point.series.color + '">'+ point.series.name + '</span>: <b>' + point.y +'</b>';
+			            		});
+			            		return result;
+			            	},
 			            	shared: true
 			            },
 			            exporting: {
