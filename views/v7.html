@@ -1771,7 +1771,7 @@
 					var  table,
 					option = {
 						theme :  "bootstrap",
-						showProcessing : true,
+						// showProcessing : true,
 						headerTemplate : '{content} {icon}',
 						widgets : ["uitheme", "zebra", "stickyHeaders", "filter"],
 						// widgetOptions : {
@@ -1780,8 +1780,8 @@
 						selectorHeaders: 'thead th.initiation',
 						widgetOptions : {
 							filter_columnFilters: false,
-							filter_external : '.search',
-							filter_searchDelay : 500,
+							filter_external : '.input-match-filter',
+							filter_searchDelay : 300,
 						},
 					}	
 
@@ -2234,13 +2234,13 @@
 
 								<tr class="table-table-header">
 
-									<th class="custom-filter-cell center">
-										<input class="input-match-filter-campaign search" type="search" data-column="0" placeholder="Search For Campaign"/>
+									<th class="custom-filter-cell">
+										<input class="input-match-filter custom-filter" type="search" data-column="0" placeholder="Filter Campaign"/>
 									</th>
 									
-									<th class="custom-filter-cell center">
+									<th class="custom-filter-cell">
 
-										<select id="socialNetworkDestinationFilter" class="social-network-selector">
+										<select id="socialNetworkDestinationFilter" class="custom-filter">
 											<option value="1">All</option>
 											<option value="2">Facebook</option>
 											<option value="3">Twitter</option>
@@ -2288,8 +2288,8 @@
 
 								<tr class="table-table-header">
 
-									<th class="custom-filter-cell center">
-										<input class="input-match-filter-article search" type="search" data-column="0" placeholder="Search For Article"/>		
+									<th class="custom-filter-cell">
+										<input class="input-match-filter custom-filter" type="search" data-column="0" placeholder="Filter Content"/>		
 									</th>
 
 	  								<th class='m-width initiation' data-tt='click'>Clicks</th>

@@ -335,29 +335,24 @@
 	text-align: center;
 }
 
-.social-network-filter-label {
+/*.social-network-filter-label {
 	margin-right: 8px;
 	display: inline-block;
 	vertical-align: middle;
+}*/
+
+.custom-filter {
+	width: 100%;
+	max-width: 70%;
+	margin-bottom: 0px !important;
+	font-size: 12px !important;
 }
 
-.input-match-filter-campaign {
+/*.social-network-selector {
 	width: 100%;
 	max-width: 180px;
 	margin-bottom: 0px !important;
-}
-
-.input-match-filter-article {
-	width: 100%;
-	max-width: 280px;
-	margin-bottom: 0px !important;
-}
-
-.social-network-selector {
-	width: 100%;
-	max-width: 180px;
-	margin-bottom: 0px !important;
-}
+}*/
 
 .tablesorter-headerRow .tablesorter-header {
 	font-size: 12px;
