@@ -1773,11 +1773,17 @@
 						theme :  "bootstrap",
 						showProcessing : true,
 						headerTemplate : '{content} {icon}',
-						widgets : ["uitheme", "zebra", "stickyHeaders"],
+						widgets : ["uitheme", "zebra", "stickyHeaders", "filter"],
 						// widgetOptions : {
 						// 	stickyHeaders_attachTo: null
 						// }
-					}
+						selectorHeaders: 'thead th.initiation',
+						widgetOptions : {
+							filter_columnFilters: false,
+							filter_external : '.search',
+							filter_searchDelay : 500,
+						},
+					}	
 
 					switch ( type ) {
 
@@ -2182,9 +2188,9 @@
 			<div class="tab-custom-container">
 				<ul class="tab-custom-ul">
 					<li id="campaignTableTab" class="table-tab tab-custom-li tab-custom-left">Campaigns</li
-					><li id="socialNetworkTableTab" class="table-tab tab-custom-li">Social Networks</li
 					><li id="contentTableTab" class="table-tab tab-custom-li">Content</li
-					><li id="userTableTab" class="table-tab tab-custom-li tab-custom-right">Users</li>
+					><li id="userTableTab" class="table-tab tab-custom-li tab-custom-right">Users</li
+					><li id="socialNetworkTableTab" class="table-tab tab-custom-li">Social Networks</li>
 				</ul>
 
 				<div class="drilldown-restore-container hide">
@@ -2202,9 +2208,8 @@
 				<div id="campaignTableContainer" class="campaign-table-container hide" data-custom-state="default">
 					
 					<h5 class="inline">Campaign Performance Summary</h5>
-					<div class="social-network-select-container">
+<!-- 					<div class="social-network-select-container">
 						<span class="social-network-filter-label"> Social Network:</span>
-
 						<select id="socialNetworkDestinationFilter" class="social-network-selector">
 							<option value="1">All</option>
 							<option value="2">Facebook</option>
@@ -2212,7 +2217,7 @@
 							<option value="4">LinkedIn</option>
 						</select>
 
-					</div>
+					</div> -->
 
 					<div id="campaignTableWrapper" class="wrapper">
 
@@ -2220,66 +2225,44 @@
 							<thead>
 								
 								<tr class="table-table-header"> 
-	  								<th colspan="1" rowspan="2" data-sorter="false">Campaign</th>
-	  								<th colspan="1" rowspan="2" data-tt='destination' data-sorter="false">Destination</th>
-	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
+	  								<th class="initiation" colspan="1" rowspan="1" data-sorter="false">Campaign</th>
+	  								<th class="initiation" colspan="1" rowspan="1" data-tt='destination' data-sorter="false">Social Destination</th>														
+	  								<th class='m-width initiation' colspan="1" rowspan="2" data-tt='post'>Posts</th>
+	  								<th class='m-width center initiation' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
+	  								<th class='m-width center initiation' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
 	  							</tr>
 
 								<tr class="table-table-header">
-	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='like'>Likes + Favorites</th>
-	  								<th class='m-width' data-tt='share'>Shares + Retweets</th>
-	  								<th class='m-width' data-tt='comment'>Comments</th>
+
+									<th class="custom-filter-cell center">
+										<input class="input-match-filter-campaign search" type="search" data-column="0" placeholder="Search For Campaign"/>
+									</th>
+									
+									<th class="custom-filter-cell center">
+
+										<select id="socialNetworkDestinationFilter" class="social-network-selector">
+											<option value="1">All</option>
+											<option value="2">Facebook</option>
+											<option value="3">Twitter</option>
+											<option value="4">LinkedIn</option>
+										</select>
+
+									</th>
+
+	  								<th class='m-width initiation' data-tt='click'>Clicks</th>
+	  								<th class='m-width initiation' data-tt='like'>Likes + Favorites</th>
+	  								<th class='m-width initiation' data-tt='share'>Shares + Retweets</th>
+	  								<th class='m-width initiation' data-tt='comment'>Comments</th>
 	  								
-	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
-	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
-	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
-	  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
+	  								<th class='m-width initiation' data-tt='clickRate'>Click Rate</th>
+	  								<th class='m-width initiation' data-tt='appRate'>Applause Rate</th>
+	  								<th class='m-width initiation' data-tt='ampRate'>Amplification Rate</th>
+	  								<th class='m-width initiation' data-tt='convRate'>Conversation Rate</th>
 	  							</tr>
 								
 							</thead>
 							<tbody class="campaign-table-body table-table-body">
 
-							</tbody>
-						</table>
-
-					</div>
-
-				</div>
-			
-				<div id="socialNetworkTableContainer" class="social-network-table-container hide" data-custom-state="default">
-					
-					<h5>Social Network Performance Summary</h5>
-					
-					<div id="socialNetworkTableWrapper" class="wrapper">
-					
-						<table id="socialNetworkTable" class="table table-hover table-bordered">
-							<thead>
-
-				  				<tr class="table-table-header"> 
-	  								<th colspan="1" rowspan="2" data-sorter="false">Social Network</th>
-	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
-	  							</tr>
-
-								<tr class="table-table-header">
-	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='like'>Likes + Favorites</th>
-	  								<th class='m-width' data-tt='share'>Shares + Retweets</th>
-	  								<th class='m-width' data-tt='comment'>Comments</th>
-	  								
-	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
-	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
-	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
-	  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
-	  							</tr>
-							
-							</thead>
-							<tbody class="social-network-table-body table-table-body">
-								
 							</tbody>
 						</table>
 
@@ -2297,22 +2280,27 @@
 							<thead>
 								
 	  							<tr class="table-table-header"> 
-	  								<th colspan="1" rowspan="2" data-sorter="false">Title</th>
-	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
+	  								<th class="initiation" colspan="1" rowspan="1" data-sorter="false">Title</th>
+	  								<th class='m-width initiation' colspan="1" rowspan="2" data-tt='post'>Posts</th>
+	  								<th class='m-width center initiation' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
+	  								<th class='m-width center initiation' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
 	  							</tr>
 
 								<tr class="table-table-header">
-	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='like'>Likes + Favorites</th>
-	  								<th class='m-width' data-tt='share'>Shares + Retweets</th>
-	  								<th class='m-width' data-tt='comment'>Comments</th>
+
+									<th class="custom-filter-cell center">
+										<input class="input-match-filter-article search" type="search" data-column="0" placeholder="Search For Article"/>		
+									</th>
+
+	  								<th class='m-width initiation' data-tt='click'>Clicks</th>
+	  								<th class='m-width initiation' data-tt='like'>Likes + Favorites</th>
+	  								<th class='m-width initiation' data-tt='share'>Shares + Retweets</th>
+	  								<th class='m-width initiation' data-tt='comment'>Comments</th>
 	  								
-	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
-	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
-	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
-	  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
+	  								<th class='m-width initiation' data-tt='clickRate'>Click Rate</th>
+	  								<th class='m-width initiation' data-tt='appRate'>Applause Rate</th>
+	  								<th class='m-width initiation' data-tt='ampRate'>Amplification Rate</th>
+	  								<th class='m-width initiation' data-tt='convRate'>Conversation Rate</th>
 	  							</tr>
 							
 							</thead>
@@ -2364,22 +2352,22 @@
 							<thead>
 								
 				  				<tr class="table-table-header"> 
-	  								<th colspan="1" rowspan="2" data-sorter="false">User</th>
-	  								<th class='m-width' colspan="1" rowspan="2" data-tt='post'>Posts</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
-	  								<th class='m-width center' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
+	  								<th class="initiation" colspan="1" rowspan="2" data-sorter="false">User</th>
+	  								<th class='m-width initiation' colspan="1" rowspan="2" data-tt='post'>Posts</th>
+	  								<th class='m-width center initiation' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
+	  								<th class='m-width center initiation' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
 	  							</tr>
 
 								<tr class="table-table-header">
-	  								<th class='m-width' data-tt='click'>Clicks</th>
-	  								<th class='m-width' data-tt='like'>Likes + Favorites</th>
-	  								<th class='m-width' data-tt='share'>Shares + Retweets</th>
-	  								<th class='m-width' data-tt='comment'>Comments</th>
+	  								<th class='m-width initiation' data-tt='click'>Clicks</th>
+	  								<th class='m-width initiation' data-tt='like'>Likes + Favorites</th>
+	  								<th class='m-width initiation' data-tt='share'>Shares + Retweets</th>
+	  								<th class='m-width initiation' data-tt='comment'>Comments</th>
 	  								
-	  								<th class='m-width' data-tt='clickRate'>Click Rate</th>
-	  								<th class='m-width' data-tt='appRate'>Applause Rate</th>
-	  								<th class='m-width' data-tt='ampRate'>Amplification Rate</th>
-	  								<th class='m-width' data-tt='convRate'>Conversation Rate</th>
+	  								<th class='m-width initiation' data-tt='clickRate'>Click Rate</th>
+	  								<th class='m-width initiation' data-tt='appRate'>Applause Rate</th>
+	  								<th class='m-width initiation' data-tt='ampRate'>Amplification Rate</th>
+	  								<th class='m-width initiation' data-tt='convRate'>Conversation Rate</th>
 	  							</tr>
 							
 							</thead>
@@ -2389,7 +2377,45 @@
 						</table>
 
 					</div>
-				</div>	
+				</div>
+
+				<div id="socialNetworkTableContainer" class="social-network-table-container hide" data-custom-state="default">
+					
+					<h5>Social Network Performance Summary</h5>
+					
+					<div id="socialNetworkTableWrapper" class="wrapper">
+
+						<table id="socialNetworkTable" class="table table-hover table-bordered">
+							<thead>
+
+								<tr class="table-table-header"> 
+									<th class="initiation" colspan="1" rowspan="2" data-sorter="false">Social Network</th>
+									<th class='m-width initiation' colspan="1" rowspan="2" data-tt='post'>Posts</th>
+									<th class='m-width center initiation' colspan="4" rowspan="1" data-sorter="false">Interactions</th>
+									<th class='m-width center initiation' colspan="4" rowspan="1" data-sorter="false">Interaction Rates</th>
+								</tr>
+
+								<tr class="table-table-header">
+									<th class='m-width initiation' data-tt='click'>Clicks</th>
+									<th class='m-width initiation' data-tt='like'>Likes + Favorites</th>
+									<th class='m-width initiation' data-tt='share'>Shares + Retweets</th>
+									<th class='m-width initiation' data-tt='comment'>Comments</th>
+
+									<th class='m-width initiation' data-tt='clickRate'>Click Rate</th>
+									<th class='m-width initiation' data-tt='appRate'>Applause Rate</th>
+									<th class='m-width initiation' data-tt='ampRate'>Amplification Rate</th>
+									<th class='m-width initiation' data-tt='convRate'>Conversation Rate</th>
+								</tr>
+
+							</thead>
+							<tbody class="social-network-table-body table-table-body">
+								
+							</tbody>
+						</table>
+
+					</div>
+
+				</div>
 
 			</div>
 

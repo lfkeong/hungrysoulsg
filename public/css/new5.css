@@ -321,6 +321,11 @@
 	width: 12%;
 }
 
+.custom-filter-cell {
+	background-color: #eee;
+	vertical-align: middle !important;
+}
+
 .table-table-body {
 	font-size: 12px;
 }
@@ -336,10 +341,22 @@
 	vertical-align: middle;
 }
 
+.input-match-filter-campaign {
+	width: 100%;
+	max-width: 180px;
+	margin-bottom: 0px !important;
+}
+
+.input-match-filter-article {
+	width: 100%;
+	max-width: 280px;
+	margin-bottom: 0px !important;
+}
+
 .social-network-selector {
-	vertical-align: middle;
-	display: inline-block;
-	margin: 0px !important;
+	width: 100%;
+	max-width: 180px;
+	margin-bottom: 0px !important;
 }
 
 .tablesorter-headerRow .tablesorter-header {
