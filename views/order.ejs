@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bootflat</title>
+  <!-- Sets initial viewport load and disables zooming  -->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="shortcut icon" href="favicon_16.ico"/>
+  <link rel="bookmark" href="favicon_16.ico"/>
+  <!-- site css -->
+  <link rel="stylesheet" href="css/style.css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Raleway|Roboto:900,400,700,500,300,300italic,100' rel='stylesheet' type='text/css'>
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+      <![endif]-->
+
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+
+  <script type="text/javascript">
+
+        var BattlehackClientToken = "<%= clientToken %>";
+        console.log(BattlehackClientToken);
+  </script>
+
+    </head>
+
+    <body>
+
+
+      <script type="text/javascript">
+
+      $(document).ready(function(){
+
+        braintree.setup( BattlehackClientToken, 'custom', {
+          id: 'checkout'
+        });
+      });
+
+      </script>
+
+      <img src="./img/logo-light.jpg" alt="logo" style="width: 100%">
+
+      <div class="item order">
+        <img src="./img/briyani.jpg" alt="briyani" style="width: 100%">
+        <div class="container">
+          <div id="order" class="desc">
+            <p class="title">PRIYA'S BRIYANI</p>
+            <p>Monday 12pm-1pm</p>
+          </div>
+        </div>
+        <div class="order inputs">
+          <hr class="line">
+          <div class="container info">
+            <p style="padding-bottom: 10px;">Healthier version for my family, cooked using vegetable oil. Contains coriander, egg, potato, onion, chicken, and chilli to taste.</p>
+            <a class="tag">+ SPICY</a> <a class="tag">+ LOCAL</a> <a class="tag">+ HALAL</a> <a class="tag">+ CHICKEN</a>
+            
+          </div>
+        </div>
+      </div>
+      <div style="clear: both;"></div>
+
+      <div class="container ship" style="margin: 130px 0 0 0">
+        <p class="title">SHIPPING INFO</p>
+
+        <form id="checkout" action="/checkout" method="post">
+
+          <input class="full" type="text" placeholder="Full Name">
+          <input class="full" type="text" placeholder="Address">
+          <input class="half" type="text" placeholder="Postal Code" data-braintree-name="postal_code">
+          <input class="half last" type="text" placeholder="Contact Number">
+          
+          <p class="title">PAYMENT INFO</p>
+
+          <input class="full" type="text" data-braintree-name="number" placeholder="Credit Card Number">
+          <input class="half" type="text" data-braintree-name="expiration_date" placeholder="Expiration Date">
+          <input class="half last" type="text" data-braintree-name="cvv" placeholder="CVV">
+
+          <button type="submit" id="checkoutBtn" class="button price" style=" width: 40%; font-size: 0.85em; margin-top: 10px;"><p style="color: #fff;">Pay $4.90<i class="fa fa-angle-right" style="padding: 0 5px; display: inline"></i></p></button>
+
+        </form>
+
+      </div>
+
+      <script>
+
+        // $('#checkoutBtn').click(function(){
+
+        //   var client = new braintree.api.Client({clientToken: BattlehackClientToken});
+        //   client.tokenizeCard({
+        //     number: "4111111111111111", 
+        //     expirationDate: "10/20",
+        //     cvv: "832",
+        //   }, function (err, nonce) {
+        //     $.post("/checkout", 
+        //       {nonce: nonce},function() {
+        //         document.location.pathname = "/battlehack/confirm";
+        //       })
+              
+        //   });
+        // });
+
+
+      </script>
+
+
+    </body>
+    </html>

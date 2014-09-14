@@ -1,0 +1,44 @@
+<html>
+<head>
+	
+	<title></title>
+
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+
+	<script type="text/javascript">
+
+        BattlehackClientToken = "<%= clientToken %>";
+        console.log(BattlehackClientToken);
+	</script>
+
+</head>
+<body>
+
+	<script type="text/javascript">
+
+	$(document).ready(function(){
+
+		braintree.setup( BattlehackClientToken, 'dropin', {
+			container: 'dropin',
+			 paypal: {
+   				singleUse: true
+  			}
+		});
+	});
+
+	</script>
+
+
+	<form id="checkout" method="post" action="/checkout">
+  		<div id="dropin"></div>
+
+  		<input type="text" placeholder="Name">
+  		<input type="text" placeholder="Address">
+  		<input type="text" placeholder="Postal Code">
+  		<input type="text" placeholder="Phone Number">
+  		<input type="submit" value="Proceed to checkout">
+	</form>
+
+</body>
+</html>

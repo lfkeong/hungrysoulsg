@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bootflat</title>
+  <!-- Sets initial viewport load and disables zooming  -->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="shortcut icon" href="favicon_16.ico"/>
+  <link rel="bookmark" href="favicon_16.ico"/>
+  <!-- site css -->
+  <link rel="stylesheet" href="css/style.css">
+  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href='http://fonts.googleapis.com/css?family=Raleway|Roboto:900,400,700,500,300,300italic,100' rel='stylesheet' type='text/css'>
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+      <![endif]-->
+
+    </head>
+    <body>
+
+      <div id="main-hero" class="container">
+        <img src="./img/logo.png" alt="logo" style="margin-left: 2.5%">
+        <i class="fa fa-bars fa-lg" style="float: right; margin-right: 2.5%; padding-top: 2.5%;"></i>
+        <hr>
+        <h1 id="hero">GET SERVED HOMEMADE FOOD</h1>
+        <a href="#" class="button">EXPLORE DISHES</a>
+        <a href="#">How it works</a>
+      </div>
+
+      <div class="container" style="padding-top: 10%;; padding-bottom: 7.5%">
+        <h2>What's Cookin' Near You</h2>
+        <a href="#" class="button" style="letter-spacing: 0; width: 60%; padding: 2% 5% 2% 5%; margin: 5% auto 0 auto;">
+          <span style="font-weight: 300; color: #4d4d4d">Sort by</span><i class="fa fa-sort-desc" style="color:#4d4d4d; padding: 0 10px; vertical-align: text-top"></i><span style="font-weight: 600">TIME LEFT</span>
+        </a>
+      </div>
+
+      <div class="item">
+        <div class="timer"><p><i class="fa fa-clock-o"></i> <span id="briyani-timer"><span></p>
+        </div>
+        <img src="./img/briyani.jpg" alt="briyani" style="width: 100%">
+        <div class="container">
+          <div class="desc">
+            <p class="title">PRIYA'S BRIYANI</p>
+            <p>Monday 12pm-1pm</p>
+          </div>
+          <div class="price">
+            <a href="order" id="price-trigger" class="button price"><p>$4.90<i class="fa fa-angle-down" style="padding-left: 10px;"></i></p></a>
+          </div>
+        </div>
+        <div class="order hidden">
+          <hr class="line">
+          <div class="container info">
+            <p style="padding-bottom: 10px;">Healthier version for my family, cooked using vegetable oil. Contains coriander, egg, potato, onion, chicken, and chilli to taste.</p>
+            <button class="tag">+ SPICY</button> <button class="tag">+ LOCAL</button> <button class="tag">+ HALAL</button> <button class="tag">+ CHICKEN</button>
+            <div class="relative" style="padding-top: 10px;">
+              <input class="special" type="text" placeholder="Add special request">
+              <a href="order.html#order" class="button price" style="position:absolute; top: 20px; right: 0;"><p>ORDER<i class="fa fa-angle-right" style="padding-left: 10px; top: 10px"></i></p></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="timer"><p><i class="fa fa-clock-o"></i> <span id="laksa-timer"><span></p>
+        </div>
+        <img src="./img/laska.jpg" alt="laksa" style="width: 100%">
+        <div class="container" style="height: 100px;">
+          <div class="desc">
+            <p class="title">JAMIE'S KAMPONG LAKSA</p>
+            <p>Monday 6pm-7pm</p>
+          </div>
+          <div class="price">
+            <a href="order" class="button price"><p>$7.90<i class="fa fa-angle-down" style="padding-left: 10px;"></i></p></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="timer"><p><i class="fa fa-clock-o"></i> <span id="nasi-timer"><span></p>
+        </div>
+        <img src="./img/nasi.jpg" alt="nasi" style="width: 100%">
+        <div class="container">
+          <div class="desc">
+            <p class="title">NUR'S NASI LEMAK</p>
+            <p>Tuesday 12pm-1pm</p>
+          </div>
+          <div class="price">
+            <a href="order" class="button price"><p>$4.50<i class="fa fa-angle-down" style="padding-left: 10px;"></i></p></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="timer"><p><i class="fa fa-clock-o"></i> <span id="noodles-timer"><span></p>
+        </div>
+        <img src="./img/noodles.jpg" alt="noodles" style="width: 100%">
+        <div class="container">
+          <div class="desc">
+            <p class="title">ANN'S NOODLES</p>
+            <p>Tuesday 12pm-1pm</p>
+          </div>
+          <div class="price">
+            <a href="order" class="button price"><p>$5.50<i class="fa fa-angle-down" style="padding-left: 10px;"></i></p></a>
+          </div>
+        </div>
+      </div>
+      <img src="./img/loading.png" alt="loading" style="display: block; margin: 5% auto">
+
+    </body>
+
+
+    <script src="./js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript">
+    $("#price-trigger").click(function() {
+      $(".order").toggleClass("hidden");
+    });
+    var s=35; 
+    var m=08;
+    var h=00;
+
+    function display(){ 
+     if (s<=0){ 
+      s=10; 
+      m-=1; 
+    } 
+    if (m<=-1){ 
+      s=0; 
+      m+=1;
+    } 
+    else 
+      s-=1; 
+    document.getElementById("briyani-timer").innerHTML=h+":"+("0" + (+m + 1)).slice(-2)+":"+("0" + (+s + 1)).slice(-2); 
+    setTimeout("display()",1000); 
+  }; 
+  display();
+
+  var s2=08; 
+  var m2=49;
+  var h2=00;
+
+  function display2(){ 
+   if (s2<=0){ 
+    s2=10; 
+    m2-=1; 
+  } 
+  if (m2<=-1){ 
+    s2=0; 
+    m2+=1;
+  } 
+  else 
+    s2-=1; 
+  document.getElementById("laksa-timer").innerHTML=h2+":"+("0" + (+m2 + 1)).slice(-2)+":"+("0" + (+s2 + 1)).slice(-2); 
+  setTimeout("display2()",1000); 
+}; 
+display2();
+
+var s3=54; 
+var m3=12;
+var h3=03;
+
+function display3(){ 
+ if (s3<=0){ 
+  s3=10; 
+  m3-=1; 
+} 
+if (m3<=-1){ 
+  s3=0; 
+  m3+=1;
+} 
+else 
+  s3-=1; 
+document.getElementById("nasi-timer").innerHTML=h3+":"+("0" + (+m3 + 1)).slice(-2)+":"+("0" + (+s3 + 1)).slice(-2); 
+setTimeout("display3()",1000); 
+}; 
+display3();
+
+var s4=35; 
+var m4=22;
+var h4=05;
+
+function display4(){ 
+ if (s4<=0){ 
+  s4=10; 
+  m4-=1; 
+} 
+if (m4<=-1){ 
+  s4=0; 
+  m4+=1;
+} 
+else 
+  s4-=1; 
+document.getElementById("noodles-timer").innerHTML=h4+":"+("0" + (+m4 + 1)).slice(-2)+":"+("0" + (+s4 + 1)).slice(-2); 
+setTimeout("display4()",1000); 
+}; 
+display4();
+</script>
+</html>
