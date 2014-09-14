@@ -68,16 +68,16 @@
 
         <form id="checkout" action="/checkout" method="post">
 
-          <input class="full" type="text" placeholder="Full Name">
-          <input class="full" type="text" placeholder="Address">
-          <input class="half" type="text" placeholder="Postal Code" data-braintree-name="postal_code">
-          <input class="half last" type="text" placeholder="Contact Number">
+          <input class="full" type="text" placeholder="Full Name" value="Keong Loong Fuo">
+          <input class="full" type="text" placeholder="Address" value="20, Heng Mui Keng Terrace">
+          <input class="half" type="text" placeholder="Postal Code" data-braintree-name="postal_code" value="119618">
+          <input class="half last" type="text" placeholder="Contact Number" value="+6594463205">
           
           <p class="title">PAYMENT INFO</p>
 
-          <input class="full" type="text" data-braintree-name="number" placeholder="Credit Card Number">
-          <input class="half" type="text" data-braintree-name="expiration_date" placeholder="Expiration Date">
-          <input class="half last" type="text" data-braintree-name="cvv" placeholder="CVV">
+          <input class="full" type="text" data-braintree-name="number" placeholder="Credit Card Number" value="4111111111111111">
+          <input class="half" type="text" data-braintree-name="expiration_date" placeholder="Expiration Date" value="10/20">
+          <input class="half last" type="text" data-braintree-name="cvv" placeholder="CVV" value="876">
 
           <button type="submit" id="checkoutBtn" class="button price" style=" width: 40%; font-size: 0.85em; margin-top: 10px;"><p style="color: #fff;">Pay $4.90<i class="fa fa-angle-right" style="padding: 0 5px; display: inline"></i></p></button>
 
