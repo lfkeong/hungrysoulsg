@@ -28,7 +28,7 @@ app.configure('development', function(){
    	app.use(express.errorHandler());
 });
 
-app.get"/", function (req, res) {
+app.get("/", function (req, res) {
     res.render('home', {});
 });
 
